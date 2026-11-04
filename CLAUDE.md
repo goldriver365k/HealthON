@@ -16,12 +16,12 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
 
 ### Supabase 설정 진행 상황 (2026-11-05) — 자세한 표: docs/SUPABASE_SETUP.md 맨 위
 - 개발용 프로젝트 ref `ufwqvfodqypbzrmdzdsq` (⚠ 지역 ap-south-1 뭄바이 → 실제 데이터 전 서울로 새 프로젝트, 4단계)
-- 토큰은 **네트워크 시크릿**(Bearer, `api.supabase.com`, `/v1/`)으로 주입됨. 환경변수 없음. 토큰 값을 출력·저장하지 않는다.
+- (삭제됨) 토큰은 **네트워크 시크릿**(Bearer, `api.supabase.com`, `/v1/`)으로 주입됨. 환경변수 없음. 토큰 값을 출력·저장하지 않는다.
   권한: 프로젝트 설정 읽기, 자문가 읽기, API 키 읽기(비밀 없음), 인증 구성 읽기/쓰기, DB 읽기, 엣지 함수 읽기/쓰기. 만료 2026-11-05.
   - 인증 메일 설정(`PATCH /config/auth`)은 `project_admin_write`가 필요해 토큰으로 불가 → 사용자가 대시보드에서 설정
 - 완료: DB 적용 확인(표 14·RLS 14), 보안 자문가 확인, `delete-account` 배포(401 확인), 공개용 키 확인
 - 2026-11-04: 로그인 메일 설정 완료. SMTP(Gmail 앱 비밀번호, 개발용) 연결 후 PATCH 200, GET으로 OTP 6자리·600초·두 템플릿 `{{ .Token }}` 확인.
-  ⏸ 사용자: 토큰(`claude-setup`, `claude-setup2`) 삭제 + 네트워크 시크릿 삭제. 4단계(서울 새 프로젝트)에서는 Gmail 대신 도메인 연결된 발송 서비스로 교체.
+  ✅ 토큰 삭제 확인(2026-11-04, API 401). 이후 Supabase API 작업이 필요하면 사용자에게 새 토큰을 요청. 4단계(서울 새 프로젝트)에서는 Gmail 대신 도메인 연결된 발송 서비스로 교체.
 - 남음(사용자): `20261105000002_lock_trigger_functions.sql` 실행(SQL 4줄), `.env` 작성 후 휴대폰 확인
 
 ## 작업 규칙
