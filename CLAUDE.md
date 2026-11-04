@@ -20,10 +20,8 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
   권한: 프로젝트 설정 읽기, 자문가 읽기, API 키 읽기(비밀 없음), 인증 구성 읽기/쓰기, DB 읽기, 엣지 함수 읽기/쓰기. 만료 2026-11-05.
   - 인증 메일 설정(`PATCH /config/auth`)은 `project_admin_write`가 필요해 토큰으로 불가 → 사용자가 대시보드에서 설정
 - 완료: DB 적용 확인(표 14·RLS 14), 보안 자문가 확인, `delete-account` 배포(401 확인), 공개용 키 확인
-- 2026-11-04 결과: 토큰(`claude-setup2`) 주입 성공(접두사 `Bearer` 칸 비어 있던 것이 원인). mailer_otp_length=6, mailer_otp_exp=600 확인.
-  메일 문구 변경은 400 "Email template modification is not available for free tier projects using the default email provider" → **사용자가 SMTP 연결 필요**(Authentication > Emails > SMTP Settings, 비밀번호는 사용자가 대시보드에 직접 입력).
-- **다음 작업 (사용자가 "SMTP 연결했어"라고 하면)**: 같은 PATCH(`--data-binary @supabase/setup/auth_email_settings.json`)를 다시 실행 → GET으로 두 템플릿에 `{{ .Token }}` 확인 → 사용자에게 **두 토큰 삭제 + 네트워크 시크릿 삭제** 안내 (위험 등급 권한).
-  401 "Format is Authorization: Bearer" 이면 시크릿의 접두사 칸에 `Bearer`가 들어갔는지 확인 요청.
+- 2026-11-04: 로그인 메일 설정 완료. SMTP(Gmail 앱 비밀번호, 개발용) 연결 후 PATCH 200, GET으로 OTP 6자리·600초·두 템플릿 `{{ .Token }}` 확인.
+  ⏸ 사용자: 토큰(`claude-setup`, `claude-setup2`) 삭제 + 네트워크 시크릿 삭제. 4단계(서울 새 프로젝트)에서는 Gmail 대신 도메인 연결된 발송 서비스로 교체.
 - 남음(사용자): `20261105000002_lock_trigger_functions.sql` 실행(SQL 4줄), `.env` 작성 후 휴대폰 확인
 
 ## 작업 규칙
