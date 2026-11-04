@@ -72,3 +72,21 @@ export async function applyPlan(plan: PlannedNotification[]): Promise<number> {
   }
   return plan.length;
 }
+
+/** 지금 예약되어 있는 알림 개수 (설정 화면 확인용) */
+export async function countScheduled(): Promise<number> {
+  if (!notificationsSupported) return 0;
+  return (await Notifications.getAllScheduledNotificationsAsync()).length;
+}
+
+/** 시험 알림: 10초 뒤 한 번. 알림이 휴대폰에 뜨는지 확인용 (건강 정보 없음) */
+export async function sendTestNotification(): Promise<boolean> {
+  if (!notificationsSupported) return false;
+  configure();
+  if ((await getPermission()) !== 'granted') return false;
+  await Notifications.scheduleNotificationAsync({
+    content: { title: '오늘건강 시험 알림', body: '알림이 잘 와요', data: { url: '/' } },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 10, channelId: CHANNEL_ID },
+  } as Notifications.NotificationRequestInput);
+  return true;
+}

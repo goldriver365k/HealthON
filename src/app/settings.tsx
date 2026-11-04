@@ -9,10 +9,10 @@ import { AppButton, AppText, Card, ChoiceButtons, Notice, Screen, useFlash } fro
 import { useAuth } from '@/data/auth';
 import { useAppState, useFontScale, useRepository } from '@/data/store';
 import { useSafeAction } from '@/hooks/useSafeAction';
-import { getPermission, notificationsSupported, type PermissionState } from '@/notifications/scheduler';
+import { countScheduled, getPermission, notificationsSupported, sendTestNotification, type PermissionState } from '@/notifications/scheduler';
 import { fontScaleOptions } from '@/theme';
 import type { ConsentType } from '@/types/domain';
-import { confirmAsync } from '@/utils/confirm';
+import { confirmAsync, notify } from '@/utils/confirm';
 import { formatLongDate } from '@/utils/date';
 
 const consentName: Record<ConsentType, string> = {
@@ -34,9 +34,19 @@ function NotificationCard() {
   const ns = state.notificationSettings;
   const [permission, setPermission] = useState<PermissionState>('unsupported');
 
+  const [scheduled, setScheduled] = useState<number | null>(null);
+
   useEffect(() => {
     getPermission().then(setPermission);
+    countScheduled().then(setScheduled).catch(() => {});
   }, []);
+
+  const test = () =>
+    run(async () => {
+      const ok = await sendTestNotification();
+      if (ok) notify('10초 뒤에 시험 알림이 와요', '홈 화면으로 나가서 기다려 보세요. 알림이 오지 않으면 휴대폰 설정에서 알림이 켜져 있는지 확인해 주세요.');
+      else notify('알림이 꺼져 있어요', '휴대폰 설정에서 알림을 켜 주세요.');
+    });
 
   const update = (patch: Partial<typeof ns>) => run(() => repo.updateNotificationSettings({ ...ns, ...patch }));
 
@@ -49,12 +59,17 @@ function NotificationCard() {
         <Notice text="알림은 휴대폰 앱에서만 동작해요." />
       ) : permission !== 'granted' ? (
         <>
-          <Notice text={permission === 'denied' ? '휴대폰 설정에서 알림이 꺼져 있어요. 휴대폰 설정 > 오늘건강 > 알림에서 켜 주세요.' : '아직 알림을 허용하지 않았어요.'} />
+          <Notice text={permission === 'denied' ? '휴대폰 설정에서 알림이 꺼져 있어요. 휴대폰 설정 > 알림에서 이 앱(시험 중에는 Expo Go)을 켜 주세요.' : '아직 알림을 허용하지 않았어요.'} />
           {permission === 'undetermined' ? (
             <AppButton label="알림 받기" variant="secondary" onPress={() => router.push('/notifications-intro')} />
           ) : null}
         </>
-      ) : null}
+      ) : (
+        <>
+          {scheduled !== null ? <Notice text={`지금 예약된 알림: ${scheduled}개`} /> : null}
+          <AppButton label="시험 알림 받기 (10초 뒤)" variant="secondary" onPress={test} />
+        </>
+      )}
       <ChoiceButtons label="약 알림" options={onOff} value={ns.medsEnabled ? 'on' : 'off'} onChange={(v) => update({ medsEnabled: v === 'on' })} />
       <ChoiceButtons label="병원 알림" options={onOff} value={ns.appointmentsEnabled ? 'on' : 'off'} onChange={(v) => update({ appointmentsEnabled: v === 'on' })} />
       <ChoiceButtons
