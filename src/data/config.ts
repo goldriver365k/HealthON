@@ -6,8 +6,11 @@
  * 🔒 여기에는 공개용 키(anon / publishable)만 넣는다.
  *    관리자 키(service_role)는 앱에 절대 넣지 않는다.
  */
-export const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
-export const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
+/** .env 값의 흔한 실수 정리: 앞뒤 빈칸·따옴표, 주소 끝의 '/rest/v1/'·'/' */
+const clean = (v: string | undefined) => (v ?? '').trim().replace(/^["']|["']$/g, '').trim();
+
+export const supabaseUrl = clean(process.env.EXPO_PUBLIC_SUPABASE_URL).replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+export const supabaseAnonKey = clean(process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY);
 
 export type DataMode = 'demo' | 'cloud';
 
