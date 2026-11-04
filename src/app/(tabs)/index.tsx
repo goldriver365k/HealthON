@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { AppButton, AppIcon, AppText, Card, Notice, SampleBadge, Screen, StatusMark } from '@/components/ui';
 import { dataMode } from '@/data/config';
 import { DoseRow } from '@/features/today/DoseRow';
+import { NotificationReminder } from '@/features/today/NotificationReminder';
 import { appointmentsOnDate, dosesForDate, latestOnDate, questionsOf, todayProgress } from '@/data/selectors';
 import { useAppState } from '@/data/store';
 import { useNow } from '@/hooks/useNow';
@@ -41,6 +42,8 @@ export default function TodayScreen() {
       {dataMode === 'demo' ? (
         <Notice tone="sample" text="체험판이에요. 예시 데이터로 보여드리고, 입력한 내용은 앱을 다시 켜면 사라져요." />
       ) : null}
+
+      <NotificationReminder />
 
       {/* 약 확인 */}
       <Card>

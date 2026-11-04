@@ -4,6 +4,7 @@
  */
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { Linking } from 'react-native';
 
 import { AppButton, AppText, Card, ChoiceButtons, Notice, Screen, useFlash } from '@/components/ui';
 import { useAuth } from '@/data/auth';
@@ -62,7 +63,9 @@ function NotificationCard() {
           <Notice text={permission === 'denied' ? '휴대폰 설정에서 알림이 꺼져 있어요. 휴대폰 설정 > 알림에서 이 앱(시험 중에는 Expo Go)을 켜 주세요.' : '아직 알림을 허용하지 않았어요.'} />
           {permission === 'undetermined' ? (
             <AppButton label="알림 받기" variant="secondary" onPress={() => router.push('/notifications-intro')} />
-          ) : null}
+          ) : (
+            <AppButton label="휴대폰 설정 열기" variant="secondary" onPress={() => Linking.openSettings().catch(() => {})} />
+          )}
         </>
       ) : (
         <>

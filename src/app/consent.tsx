@@ -3,6 +3,8 @@
  * 🔒 보안·법률 검토 대상: 아래 문구는 초안이며 출시 전 전문가 검토로 확정한다 (MASTER_PLAN H-1 P1).
  * - 건강정보(민감정보)는 일반 개인정보 동의와 "별도로" 받는다.
  * - 동의 기록은 버전과 함께 서버(consents)에 남고, 감사기록이 생긴다.
+ * - [동의하고 시작하기]를 누르면 휴대폰 알림 허용 창을 바로 띄운다 (허용하지 않아도 시작은 됨).
+ *   알림 허용은 개인정보 동의와 별개이며, 허용 여부는 서버에 저장하지 않는다.
  */
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -10,6 +12,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppButton, AppIcon, AppText, Card, Notice, Screen } from '@/components/ui';
 import { REQUIRED_CONSENTS, useAuth } from '@/data/auth';
 import { useSafeAction } from '@/hooks/useSafeAction';
+import { getPermission, requestPermission } from '@/notifications/scheduler';
 import type { ConsentType } from '@/types/domain';
 import { colors, sizes, spacing } from '@/theme';
 
@@ -66,6 +69,8 @@ export default function ConsentScreen() {
         setError('필수 항목에 모두 동의해 주셔야 시작할 수 있어요');
         return;
       }
+      // 알림 허용 창을 먼저 (동의 저장 뒤에는 화면이 바뀌어 안내 화면과 겹칠 수 있음)
+      if ((await getPermission()) === 'undetermined') await requestPermission().catch(() => {});
       await auth.agree(REQUIRED_CONSENTS);
     });
 
