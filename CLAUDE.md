@@ -22,7 +22,8 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
 - 완료: DB 적용 확인(표 14·RLS 14), 보안 자문가 확인, `delete-account` 배포(401 확인), 공개용 키 확인
 - 2026-11-04: 로그인 메일 설정 완료. SMTP(Gmail 앱 비밀번호, 개발용) 연결 후 PATCH 200, GET으로 OTP 6자리·600초·두 템플릿 `{{ .Token }}` 확인.
   ✅ 토큰 삭제 확인(2026-11-04, API 401). 이후 Supabase API 작업이 필요하면 사용자에게 새 토큰을 요청. 4단계(서울 새 프로젝트)에서는 Gmail 대신 도메인 연결된 발송 서비스로 교체.
-- 남음(사용자): `20261105000002_lock_trigger_functions.sql` 실행(SQL 4줄), `.env` 작성 후 휴대폰 확인
+- ✅ `20261105000002_lock_trigger_functions.sql` 사용자 실행 완료(2026-11-04).
+- 남음(사용자): `.env` 작성 후 휴대폰 확인(숫자코드 로그인·가족 공유)
 
 ## 작업 규칙
 1. 작업 전에 관련 파일을 먼저 읽고 확인한다.
