@@ -10,13 +10,22 @@ import { fromDateKey } from '@/utils/date';
 
 const HEIGHT = 110;
 
-export function SimpleBars({ data, caption }: { data: { dateKey: string; value: number | null }[]; caption: string }) {
+/** fromZero: 횟수처럼 0부터 비교해야 하는 값 (막대 길이가 값에 비례) */
+export function SimpleBars({
+  data,
+  caption,
+  fromZero,
+}: {
+  data: { dateKey: string; value: number | null }[];
+  caption: string;
+  fromZero?: boolean;
+}) {
   const values = data.map((d) => d.value).filter((v): v is number => v !== null);
   if (values.length === 0) return null;
   const min = Math.min(...values);
   const max = Math.max(...values);
   // 차이가 작아도 막대 높이 차이가 보이도록 최저값 아래쪽 여유를 둔다
-  const floor = min - Math.max((max - min) * 0.6, 5);
+  const floor = fromZero ? 0 : min - Math.max((max - min) * 0.6, 5);
   const span = max - floor || 1;
   const showEvery = data.length > 10 ? 5 : 1;
 
@@ -32,7 +41,7 @@ export function SimpleBars({ data, caption }: { data: { dateKey: string; value: 
               {d.value === null ? (
                 <View style={styles.empty} />
               ) : (
-                <View style={[styles.bar, { height: Math.max(6, ((d.value - floor) / span) * HEIGHT) }]} />
+                <View style={[styles.bar, { height: fromZero && d.value === 0 ? 2 : Math.max(6, ((d.value - floor) / span) * HEIGHT) }]} />
               )}
             </View>
             {(data.length - 1 - i) % showEvery === 0 ? (

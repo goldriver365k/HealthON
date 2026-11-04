@@ -1,5 +1,5 @@
 /**
- * ② 건강기록 — 혈압·혈당·체중 목록, 최근 7일·30일 요약, 수정·삭제
+ * ② 건강기록 — 혈압·혈당·체중 목록, 최근 7일·30일 요약, 수정·삭제, 약 확인 요약(3단계)
  * ⚠ 요약은 평균·최저·최고·기록한 날 수만. 판정 문구 없음.
  */
 import { router } from 'expo-router';
@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppButton, AppText, Card, ChoiceButtons, EmptyState, ListRow, SampleBadge, Screen } from '@/components/ui';
+import { MedsSummary } from '@/features/records/MedsSummary';
 import { SimpleBars } from '@/features/records/SimpleBars';
 import { useAppState } from '@/data/store';
 import { useNow } from '@/hooks/useNow';
@@ -16,7 +17,11 @@ import { formatShortDate, formatTime } from '@/utils/date';
 import { glucoseTimingLabel, kindLabel, kindUnit, measurementSpokenText, measurementValueText } from '@/utils/labels';
 import { dailyValues, filterRecentDays, summarizePeriod, type PeriodSummary } from '@/utils/stats';
 
-const kindOptions = (['bp', 'glucose', 'weight'] as const).map((value) => ({ value, label: kindLabel[value] }));
+type RecordView = MeasurementKind | 'meds';
+const viewOptions: { value: RecordView; label: string }[] = [
+  ...(['bp', 'glucose', 'weight'] as const).map((value) => ({ value, label: kindLabel[value] })),
+  { value: 'meds', label: '약' },
+];
 const periodOptions = [
   { value: 7, label: '최근 7일' },
   { value: 30, label: '최근 30일' },
@@ -81,7 +86,8 @@ function RecordRow({ m }: { m: Measurement }) {
 export default function RecordsScreen() {
   const state = useAppState();
   const now = useNow();
-  const [kind, setKind] = useState<MeasurementKind>('bp');
+  const [view, setView] = useState<RecordView>('bp');
+  const kind: MeasurementKind = view === 'meds' ? 'bp' : view;
   const [days, setDays] = useState<7 | 30>(7);
 
   const summary = summarizePeriod(state.measurements, kind, days, now);
@@ -96,8 +102,13 @@ export default function RecordsScreen() {
 
   return (
     <Screen title="건강기록" showSettings>
-      <ChoiceButtons options={kindOptions} value={kind} onChange={setKind} columns={3} />
+      <ChoiceButtons options={viewOptions} value={view} onChange={setView} columns={2} />
       <ChoiceButtons options={periodOptions} value={days} onChange={(v) => setDays(v)} />
+
+      {view === 'meds' ? (
+        <MedsSummary days={days} now={now} />
+      ) : (
+        <>
 
       <Card>
         <AppText variant="heading" accessibilityRole="header">
@@ -119,6 +130,8 @@ export default function RecordsScreen() {
         </AppText>
         {list.length === 0 ? <EmptyState text="이 기간에는 기록이 없어요." /> : list.map((m) => <RecordRow key={m.id} m={m} />)}
       </Card>
+        </>
+      )}
     </Screen>
   );
 }

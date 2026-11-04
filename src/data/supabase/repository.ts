@@ -9,25 +9,30 @@ import type { Dispatch } from 'react';
 
 import type { AppState } from '../sampleData';
 import type { Action } from '../reducer';
+import { CONSENT_VERSION } from '../config';
 import type { Repository } from '../repository';
 import { getSupabase } from './client';
 import {
   fromAppointmentInput,
   fromMeasurementInput,
   toAppointment,
+  scopeArgs,
   toContact,
+  toFamilyLink,
   toIntake,
   toMeasurement,
   toMedication,
   toNotificationSettings,
   toQuestion,
   toSchedule,
+  toSharedSummary,
 } from './mappers';
 
 const LOAD_DAYS = 90; // 처음에 불러오는 기록 기간 (통계는 최근 30일까지)
 
 /** 사용자에게 보여줄 오류 문장 */
-export class UserFacingError extends Error {}
+import { UserFacingError } from '../errors';
+export { UserFacingError };
 
 function friendly(error: { message?: string; code?: string } | null | undefined): never {
   const msg = error?.message ?? '';
@@ -82,11 +87,43 @@ export async function loadAll(): Promise<Partial<AppState>> {
     questions: (questions as any[]).map(toQuestion),
     emergencyContacts: (contacts as any[]).map(toContact),
     notificationSettings: toNotificationSettings(notif as any),
-    // 가족 공유는 3단계
-    familyLinks: [],
-    sharedSummaries: [],
+    familyLinks: await loadFamilyLinks(),
+    sharedSummaries: [], // 가족 정보는 화면을 열 때만 불러온다 (최소 조회 + 열람 기록 정확도)
   };
 }
+
+/** 내 가족 연결 (주인·보는 가족 양쪽) + 내 정보를 본 기록(최근 7일) */
+export async function loadFamilyLinks() {
+  const sb = getSupabase();
+  const uid = (await sb.auth.getUser()).data.user?.id;
+  if (!uid) return [];
+  const since = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const [links, views] = await Promise.all([
+    must(sb.from('family_links').select('*').eq('status', 'active').order('created_at')),
+    must(
+      sb
+        .from('audit_logs')
+        .select('target_id, occurred_at')
+        .eq('action', 'family_view')
+        .gte('occurred_at', since)
+        .order('occurred_at', { ascending: false }),
+    ),
+  ]);
+  const byLink = new Map<string, { count: number; last?: string }>();
+  for (const v of views as any[]) {
+    const cur = byLink.get(v.target_id) ?? { count: 0, last: v.occurred_at };
+    cur.count += 1;
+    byLink.set(v.target_id, cur);
+  }
+  return (links as any[]).map((l) => toFamilyLink(l, uid, byLink.get(l.id)));
+}
+
+const inviteReason: Record<string, string> = {
+  invalid_code: '코드가 맞지 않거나 시간이 지났어요. 가족에게 새 코드를 받아 주세요.',
+  too_many_attempts: '여러 번 틀려서 잠시 막혔어요. 1시간 뒤에 다시 해 주세요.',
+  own_code: '내가 만든 코드예요. 가족 휴대폰에서 입력해 주세요.',
+  already_linked: '이미 연결된 가족이에요.',
+};
 
 export function createCloudRepository(dispatch: Dispatch<Action>, getState: () => AppState): Repository {
   const sb = () => getSupabase();
@@ -228,12 +265,38 @@ export function createCloudRepository(dispatch: Dispatch<Action>, getState: () =
       dispatch({ type: 'question/delete', id });
     },
 
-    // ── 가족 공유: 3단계에서 서버 함수로 구현 ──
-    async updateShareScope() {
-      throw new UserFacingError('가족 공유는 다음 단계에서 사용할 수 있어요.');
+    // ── 가족 공유 (🔒 모든 권한은 서버 함수가 다시 검사) ──
+    async createFamilyInvite(input) {
+      const code = await must(
+        sb().rpc('create_family_invite', {
+          p_relation_label: input.relationLabel,
+          p_owner_label: input.ownerLabel,
+          ...scopeArgs(input.scope),
+          p_consent_version: CONSENT_VERSION,
+        }),
+      );
+      return { code: String(code), expiresAt: new Date(Date.now() + 24 * 3600_000).toISOString() };
     },
-    async revokeLink() {
-      throw new UserFacingError('가족 공유는 다음 단계에서 사용할 수 있어요.');
+    async acceptFamilyInvite(code) {
+      const res = (await must(sb().rpc('accept_family_invite', { p_code: code }))) as any;
+      if (!res?.ok) throw new UserFacingError(inviteReason[res?.reason] ?? '연결하지 못했어요. 잠시 뒤 다시 해 주세요.');
+      dispatch({ type: 'hydrate', data: { familyLinks: await loadFamilyLinks() } });
+      return { ownerLabel: String(res.owner_label ?? '가족') };
+    },
+    async loadSharedSummary(linkId) {
+      const json = await must(sb().rpc('get_shared_summary', { p_link_id: linkId }));
+      dispatch({ type: 'summary/set', linkId, summary: toSharedSummary(linkId, json as any) });
+    },
+    async updateShareScope(linkId, scope) {
+      if (!Object.values(scope).some(Boolean)) {
+        throw new UserFacingError('하나 이상은 보여줘야 해요. 모두 그만두려면 ‘공유 그만두기’를 눌러 주세요.');
+      }
+      await must(sb().rpc('update_family_share_scope', { p_link_id: linkId, ...scopeArgs(scope) }));
+      dispatch({ type: 'link/scope', linkId, scope });
+    },
+    async revokeLink(linkId) {
+      await must(sb().rpc('revoke_family_link', { p_link_id: linkId }));
+      dispatch({ type: 'link/revoke', linkId });
     },
 
     // ── 긴급 연락처 ──

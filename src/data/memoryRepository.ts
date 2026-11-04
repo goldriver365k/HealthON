@@ -4,9 +4,12 @@
  */
 import type { Dispatch } from 'react';
 
-import type { Measurement } from '@/types/domain';
+import type { FamilyLink, Measurement, SharedSummary } from '@/types/domain';
+import { UserFacingError } from './errors';
 import { newId, type Action } from './reducer';
 import type { Repository } from './repository';
+
+export const DEMO_INVITE_CODE = '123456';
 
 export function createMemoryRepository(dispatch: Dispatch<Action>): Repository {
   const run = (action: Action) => {
@@ -41,6 +44,40 @@ export function createMemoryRepository(dispatch: Dispatch<Action>): Repository {
     addQuestion: (appointmentId, content) => run({ type: 'question/add', appointmentId, content }),
     toggleQuestion: (id) => run({ type: 'question/toggle', id }),
     deleteQuestion: (id) => run({ type: 'question/delete', id }),
+    // 체험 모드: 코드는 항상 123456, 실제 연결 없음
+    createFamilyInvite: async () => ({
+      code: DEMO_INVITE_CODE,
+      expiresAt: new Date(Date.now() + 24 * 3600_000).toISOString(),
+    }),
+    acceptFamilyInvite: async (code) => {
+      if (code.replace(/[^0-9]/g, '') !== DEMO_INVITE_CODE) {
+        throw new UserFacingError('코드가 맞지 않거나 시간이 지났어요. 가족에게 새 코드를 받아 주세요. (체험판 코드: 123456)');
+      }
+      const id = newId();
+      const now = new Date();
+      const link: FamilyLink = {
+        id,
+        role: 'viewer',
+        personName: '체험 가족',
+        relationLabel: '',
+        scope: { bp: true, glucose: true, weight: false, intakes: true, appointments: false },
+        status: 'active',
+        consentedAt: now.toISOString(),
+        source: 'sample',
+      };
+      const summary: SharedSummary = {
+        linkId: id,
+        todayIntakes: [{ label: '아침 약 (오전 8:00)', taken: true }],
+        recentBp: [{ measuredAt: now.toISOString(), systolic: 127, diastolic: 81 }],
+        recentGlucose: [{ measuredAt: now.toISOString(), glucoseMgdl: 101, glucoseTiming: 'fasting' }],
+        source: 'sample',
+      };
+      dispatch({ type: 'link/add', link, summary });
+      return { ownerLabel: '체험 가족' };
+    },
+    loadSharedSummary: async () => {
+      // 체험 모드는 예시 요약이 이미 들어 있음
+    },
     updateShareScope: (linkId, scope) => run({ type: 'link/scope', linkId, scope }),
     revokeLink: (linkId) => run({ type: 'link/revoke', linkId }),
     addEmergencyContact: (input) => run({ type: 'contact/add', ...input }),

@@ -117,3 +117,42 @@ export function intakeHistory(state: AppState, medicationId: string, days: numbe
   }
   return { total, taken };
 }
+
+export interface AdherenceSummary {
+  days: number;
+  total: number;
+  taken: number;
+  perMedication: { medicationId: string; name: string; source: Medication['source']; total: number; taken: number }[];
+  /** 날짜별 '먹었다고 표시한 횟수' (단순 막대용) */
+  daily: { dateKey: string; value: number | null }[];
+}
+
+/**
+ * 복약 확인 요약 (오늘 포함 최근 N일, 지금 먹는 약 기준).
+ * ⚠ 비율·점수·판정은 만들지 않는다. "N번 중 M번 표시"만.
+ */
+export function adherenceSummary(state: AppState, days: number, now: Date): AdherenceSummary {
+  const active = state.medications.filter((m) => m.isActive);
+  const perMedication = active.map((m) => ({
+    medicationId: m.id,
+    name: m.name,
+    source: m.source,
+    ...intakeHistory(state, m.id, days, now),
+  }));
+  const daily: { dateKey: string; value: number | null }[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const doses = dosesForDate(state, d);
+    daily.push({
+      dateKey: toDateKey(d),
+      value: doses.length ? doses.filter((x) => x.intake?.status === 'taken').length : null,
+    });
+  }
+  return {
+    days,
+    total: perMedication.reduce((a, b) => a + b.total, 0),
+    taken: perMedication.reduce((a, b) => a + b.taken, 0),
+    perMedication,
+    daily,
+  };
+}

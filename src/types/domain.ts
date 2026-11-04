@@ -142,7 +142,24 @@ export interface FamilyLink {
   status: 'active' | 'revoked';
   consentedAt: IsoDateTime;
   revokedAt?: IsoDateTime;
+  /** (내가 공유하는 쪽) 최근 7일 동안 가족이 본 횟수 — 감사기록에서 계산 */
+  viewCount7d?: number;
+  /** (내가 공유하는 쪽) 가족이 마지막으로 본 때 */
+  lastViewedAt?: IsoDateTime;
   source: DataSource;
+}
+
+export interface FamilyInviteInput {
+  /** 내가 부르는 가족 (예: 딸) */
+  relationLabel: string;
+  /** 가족에게 보일 내 이름 (예: 어머니) */
+  ownerLabel: string;
+  scope: ShareScope;
+}
+
+export interface FamilyInviteResult {
+  code: string;
+  expiresAt: IsoDateTime;
 }
 
 /**
@@ -154,7 +171,8 @@ export interface SharedSummary {
   linkId: string;
   todayIntakes?: { label: string; taken: boolean }[];
   recentBp?: { measuredAt: IsoDateTime; systolic: number; diastolic: number }[];
-  recentGlucose?: { measuredAt: IsoDateTime; glucoseMgdl: number }[];
+  recentGlucose?: { measuredAt: IsoDateTime; glucoseMgdl: number; glucoseTiming?: GlucoseTiming }[];
+  recentWeight?: { measuredAt: IsoDateTime; weightKg: number }[];
   nextAppointment?: { hospitalName: string; visitAt: IsoDateTime };
   source: DataSource;
 }

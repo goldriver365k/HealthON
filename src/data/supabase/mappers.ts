@@ -9,6 +9,7 @@ import type {
   ConsentType,
   DoseSlot,
   EmergencyContact,
+  FamilyLink,
   GlucoseTiming,
   IntakeStatus,
   Measurement,
@@ -18,6 +19,8 @@ import type {
   MedicationSchedule,
   NotificationSettings,
   RemindBefore,
+  ShareScope,
+  SharedSummary,
 } from '@/types/domain';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -144,5 +147,76 @@ export function toConsent(r: Row): ConsentRecord {
     version: r.version,
     agreedAt: r.agreed_at,
     withdrawnAt: opt(r.withdrawn_at),
+  };
+}
+
+// ── 가족 공유 (3단계) ───────────────────────────────────────────────
+const slotKo: Record<string, string> = { morning: '아침', noon: '점심', evening: '저녁', bedtime: '자기 전', custom: '정한 시간' };
+
+function hhmmToKo(t: string): string {
+  const [h, m] = t.split(':').map(Number);
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h < 12 ? '오전' : '오후'} ${h12}:${String(m).padStart(2, '0')}`;
+}
+
+/**
+ * 연결 행 → 앱 데이터. 서버 모드는 개인 이름 대신 서로 정한 호칭만 보인다.
+ * - 내가 정보 주인이면: 내가 부르는 가족 호칭 (예: 딸)
+ * - 내가 보는 가족이면: 주인이 정한 자기 호칭 (예: 어머니)
+ */
+export function toFamilyLink(r: Row, myId: string, views?: { count: number; last?: string }): FamilyLink {
+  const role = r.owner_id === myId ? 'owner' : 'viewer';
+  return {
+    id: r.id,
+    role,
+    personName: role === 'owner' ? r.relation_label : r.owner_label,
+    relationLabel: '',
+    scope: {
+      bp: r.share_bp,
+      glucose: r.share_glucose,
+      weight: r.share_weight,
+      intakes: r.share_intakes,
+      appointments: r.share_appointments,
+    },
+    status: r.status === 'revoked' ? 'revoked' : 'active',
+    consentedAt: r.consented_at,
+    revokedAt: opt(r.revoked_at),
+    viewCount7d: role === 'owner' ? (views?.count ?? 0) : undefined,
+    lastViewedAt: role === 'owner' ? views?.last : undefined,
+    source: 'real',
+  };
+}
+
+/** get_shared_summary 결과 → 앱 데이터 (서버가 허용한 항목만 들어 있음) */
+export function toSharedSummary(linkId: string, j: Row | null): SharedSummary | null {
+  if (!j) return null;
+  return {
+    linkId,
+    todayIntakes: j.intakes_today?.map((i: Row) => ({
+      label: `${slotKo[i.slot] ?? ''} 약 (${hhmmToKo(i.time_of_day)})`,
+      taken: !!i.taken,
+    })),
+    recentBp: j.bp?.map((b: Row) => ({ measuredAt: b.measured_at, systolic: b.systolic, diastolic: b.diastolic })),
+    recentGlucose: j.glucose?.map((g: Row) => ({
+      measuredAt: g.measured_at,
+      glucoseMgdl: g.glucose_mgdl,
+      glucoseTiming: g.glucose_timing as GlucoseTiming,
+    })),
+    recentWeight: j.weight?.map((w: Row) => ({ measuredAt: w.measured_at, weightKg: Number(w.weight_kg) })),
+    nextAppointment: j.next_appointment
+      ? { hospitalName: j.next_appointment.hospital_name, visitAt: j.next_appointment.visit_at }
+      : undefined,
+    source: 'real',
+  };
+}
+
+/** 앱 공유 범위 → 서버 함수 인자 */
+export function scopeArgs(s: ShareScope) {
+  return {
+    p_share_bp: s.bp,
+    p_share_glucose: s.glucose,
+    p_share_weight: s.weight,
+    p_share_intakes: s.intakes,
+    p_share_appointments: s.appointments,
   };
 }

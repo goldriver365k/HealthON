@@ -8,6 +8,8 @@
 import type {
   AppointmentInput,
   DateKey,
+  FamilyInviteInput,
+  FamilyInviteResult,
   IntakeStatus,
   MeasurementInput,
   MedicationInput,
@@ -39,7 +41,13 @@ export interface Repository {
   toggleQuestion(id: string): Promise<void>;
   deleteQuestion(id: string): Promise<void>;
 
-  // 가족 공유 (2단계 이후 서버 함수에서 권한 재검사)
+  // 가족 공유 (서버 모드: 모든 권한을 서버 함수가 다시 검사)
+  /** 초대 코드 만들기 — 제3자 제공 동의 화면을 거친 뒤에만 호출 */
+  createFamilyInvite(input: FamilyInviteInput): Promise<FamilyInviteResult>;
+  /** 초대 코드 입력 → 연결. 성공하면 가족에게 보이는 정보 주인 이름을 돌려줌 */
+  acceptFamilyInvite(code: string): Promise<{ ownerLabel: string }>;
+  /** 내가 보는 가족의 공유 정보 불러오기 (볼 때마다 서버가 권한 검사 + 열람 기록) */
+  loadSharedSummary(linkId: string): Promise<void>;
   updateShareScope(linkId: string, scope: ShareScope): Promise<void>;
   revokeLink(linkId: string): Promise<void>;
 

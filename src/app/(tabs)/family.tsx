@@ -1,15 +1,16 @@
 /**
  * ④ 가족 안심 — 119·긴급 연락처, 내 정보를 보는 가족, 내가 보는 가족
- * 1단계: 가족 연결은 예시 화면. 실제 연결·서버 권한 검사는 3단계.
+ * 서버 모드: 연결·공유 항목·열람은 모두 서버 함수가 권한을 다시 검사한다 (🔒). 체험 모드: 예시 가족.
  */
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { AppButton, AppText, Card, EmptyState, ListRow, Notice, SampleBadge, Screen } from '@/components/ui';
+import { dataMode } from '@/data/config';
 import { useAppState } from '@/data/store';
 import type { FamilyLink } from '@/types/domain';
 import { spacing } from '@/theme';
-import { shareCategories, shareCategoryLabel } from '@/utils/labels';
+import { familyLinkTitle, shareCategories, shareCategoryLabel } from '@/utils/labels';
 import { callWithConfirm } from '@/utils/phone';
 
 function scopeText(link: FamilyLink): string {
@@ -27,11 +28,11 @@ export default function FamilyScreen() {
     <ListRow
       key={l.id}
       onPress={() => router.push({ pathname: '/family/[linkId]', params: { linkId: l.id } })}
-      accessibilityLabel={`${l.personName}, ${l.relationLabel}, ${kind === 'owner' ? '공유 중' : '받는 중'}: ${scopeText(l)}${l.source === 'sample' ? ', 예시' : ''}`}
+      accessibilityLabel={`${familyLinkTitle(l)}, ${kind === 'owner' ? '공유 중' : '받는 중'}: ${scopeText(l)}${l.source === 'sample' ? ', 예시' : ''}`}
       hint={kind === 'owner' ? '누르면 공유 항목을 바꾸거나 그만둘 수 있어요' : '누르면 공유받은 정보를 볼 수 있어요'}>
       <View style={styles.line}>
         <AppText variant="heading">
-          {l.personName} ({l.relationLabel})
+          {familyLinkTitle(l)}
         </AppText>
         <SampleBadge source={l.source} />
       </View>
@@ -39,6 +40,11 @@ export default function FamilyScreen() {
         {kind === 'owner' ? '보여주는 것: ' : '받는 것: '}
         {scopeText(l)}
       </AppText>
+      {kind === 'owner' && l.viewCount7d !== undefined ? (
+        <AppText variant="caption" tone="sub">
+          최근 7일 동안 {l.viewCount7d}번 봤어요
+        </AppText>
+      ) : null}
     </ListRow>
   );
 
@@ -67,7 +73,9 @@ export default function FamilyScreen() {
         <AppButton label="긴급 연락처 관리" variant="ghost" icon="edit" onPress={() => router.push('/family/contacts')} />
       </Card>
 
-      <Notice tone="sample" text="가족 연결은 체험용 예시 화면이에요. 실제 연결은 다음 단계에서 만들어져요." />
+      {dataMode === 'demo' ? (
+        <Notice tone="sample" text="체험판이에요. 가족은 예시이고 실제 사람과 연결되어 있지 않아요." />
+      ) : null}
 
       <Card style={styles.listCard}>
         <AppText variant="heading" accessibilityRole="header" style={styles.pad}>

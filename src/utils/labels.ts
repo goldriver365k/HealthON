@@ -2,7 +2,7 @@
  * 화면에 보이는 쉬운 한국어 이름표. 전문용어 대신 쉬운 말을 쓴다.
  * (수축기 → 위 숫자, 이완기 → 아래 숫자, 공복 → 아침 식사 전)
  */
-import type { DoseSlot, GlucoseTiming, Measurement, MeasurementKind, RemindBefore, ShareCategory } from '@/types/domain';
+import type { DoseSlot, FamilyLink, GlucoseTiming, Measurement, MeasurementKind, RemindBefore, ShareCategory } from '@/types/domain';
 import type { IconName } from '@/theme';
 
 export const kindLabel: Record<MeasurementKind, string> = {
@@ -94,4 +94,9 @@ export function eulReul(word: string): string {
   const code = last.charCodeAt(0) - 0xac00;
   if (code < 0 || code > 11171) return `${word}을(를)`;
   return `${word}${code % 28 === 0 ? '를' : '을'}`;
+}
+
+/** 가족 연결 이름표: "김예솔 (딸)" 또는 서버 모드처럼 이름만 있을 때 "딸" */
+export function familyLinkTitle(l: Pick<FamilyLink, 'personName' | 'relationLabel'>): string {
+  return l.relationLabel ? `${l.personName} (${l.relationLabel})` : l.personName;
 }

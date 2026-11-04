@@ -6,6 +6,7 @@ import type {
   Appointment,
   AppointmentInput,
   DateKey,
+  FamilyLink,
   IntakeStatus,
   Measurement,
   MeasurementInput,
@@ -13,6 +14,7 @@ import type {
   MedicationSchedule,
   NotificationSettings,
   ShareScope,
+  SharedSummary,
 } from '@/types/domain';
 import { createSampleState, type AppState } from './sampleData';
 
@@ -39,6 +41,8 @@ export type Action =
   | { type: 'question/delete'; id: string }
   | { type: 'link/scope'; linkId: string; scope: ShareScope }
   | { type: 'link/revoke'; linkId: string }
+  | { type: 'link/add'; link: FamilyLink; summary?: SharedSummary }
+  | { type: 'summary/set'; linkId: string; summary: SharedSummary | null }
   | { type: 'contact/add'; name: string; phone: string; relationLabel?: string }
   | { type: 'contact/delete'; id: string }
   | { type: 'settings/fontScale'; scale: number }
@@ -212,6 +216,17 @@ export function reducer(state: AppState, action: Action): AppState {
         ),
         sharedSummaries: state.sharedSummaries.filter((s) => s.linkId !== action.linkId),
       };
+
+    case 'link/add':
+      return {
+        ...state,
+        familyLinks: [...state.familyLinks, action.link],
+        sharedSummaries: action.summary ? [...state.sharedSummaries, action.summary] : state.sharedSummaries,
+      };
+    case 'summary/set': {
+      const rest = state.sharedSummaries.filter((s) => s.linkId !== action.linkId);
+      return { ...state, sharedSummaries: action.summary ? [...rest, action.summary] : rest };
+    }
 
     case 'contact/add': {
       const max = Math.max(0, ...state.emergencyContacts.map((c) => c.priority));

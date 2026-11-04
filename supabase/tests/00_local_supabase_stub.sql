@@ -11,6 +11,9 @@ do $$ begin
 end $$;
 
 create schema auth;
+-- Supabase는 pgcrypto 등 확장 기능을 extensions 스키마에 둔다
+create schema if not exists extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
 create table auth.users (
   id    uuid primary key default gen_random_uuid(),
   email text

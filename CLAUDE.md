@@ -6,7 +6,7 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
 - 상세 계획: docs/MASTER_PLAN.md · 기능: docs/FEATURES.md · 단계: docs/ROADMAP.md
 - Expo 일반 지침: AGENTS.md (Expo 템플릿 기본 제공 — Expo API는 버전별 공식 문서를 확인)
 
-**현재 단계: 2단계 코드 완료 → ⏸ 사용자 작업 대기** (Supabase 프로젝트 생성·실기기 확인, docs/PHASE2_REPORT.md 7장). 확인 결과를 받으면 수정 후 3단계로 자동 진행.
+**현재 단계: 3단계 코드 완료 → ⏸ 사용자 작업 대기** (Supabase 연결·실기기·가족 공유 확인, docs/PHASE3_REPORT.md 7장). 확인 결과를 받으면 수정 후 4단계로 진행.
 
 ### 단계 진행 방식 (사용자 지시, 2026-11-04)
 - 2단계부터는 한 단계가 끝나고 검수 기준을 통과하면 **자동으로 다음 단계로 넘어간다.**

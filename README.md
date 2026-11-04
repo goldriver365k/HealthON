@@ -2,14 +2,14 @@
 
 50~80대를 위한 복약 확인 · 혈압/혈당 기록 앱 (Expo + React Native + TypeScript)
 
-> 현재: **2단계** — `.env`에 Supabase 주소가 없으면 체험 모드(예시 데이터), 있으면 로그인 후 서버 저장.
+> 현재: **3단계** (가족 공유·통계까지) — `.env`에 Supabase 주소가 없으면 체험 모드(예시 데이터), 있으면 로그인 후 서버 저장.
 
 ## 문서
 - [전체 개발계획](docs/MASTER_PLAN.md)
 - [기능 목록](docs/FEATURES.md)
 - [단계별 계획·검수 기준](docs/ROADMAP.md)
 - [1단계 완료 보고](docs/PHASE1_REPORT.md)
-- [2단계 보고](docs/PHASE2_REPORT.md) · [Supabase 연결 안내](docs/SUPABASE_SETUP.md)
+- [2단계 보고](docs/PHASE2_REPORT.md) · [3단계 보고](docs/PHASE3_REPORT.md) · [Supabase 연결 안내](docs/SUPABASE_SETUP.md)
 - [작업 규칙](CLAUDE.md)
 
 ## 실행
