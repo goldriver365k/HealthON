@@ -41,7 +41,8 @@ describe('알림 계획', () => {
     expect(apts.map((p) => p.id)).toEqual(['apt|s-apt-2']);
     const p = apts[0];
     expect(p.kind === 'date' && [p.date.getDate(), p.date.getHours()]).toEqual([10, 19]);
-    expect(p.title).toBe('내일 병원 가는 날이에요');
+    expect(p.title).toBe('🏥 내일은 병원 가는 날이에요');
+    expect(p.body.startsWith('내일 ')).toBe(true);
   });
 
   it('요일 지정 약은 요일별 주간 알림 (1=일요일)', () => {

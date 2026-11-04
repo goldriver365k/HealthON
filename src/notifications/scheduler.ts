@@ -10,6 +10,14 @@ import type { PlannedNotification } from './plan';
 
 export const notificationsSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 const CHANNEL_ID = 'reminders';
+/** 안드로이드 알림 채널: 소리 + 진동 + 잠금화면 표시 */
+const CHANNEL: Notifications.NotificationChannelInput = {
+  name: '약·병원 알림',
+  importance: Notifications.AndroidImportance.HIGH,
+  sound: 'default',
+  vibrationPattern: [0, 400, 200, 400],
+  lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+};
 
 let configured = false;
 function configure() {
@@ -38,10 +46,7 @@ export async function getPermission(): Promise<PermissionState> {
 export async function requestPermission(): Promise<PermissionState> {
   if (!notificationsSupported) return 'unsupported';
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-      name: '약·병원 알림',
-      importance: Notifications.AndroidImportance.HIGH,
-    });
+    await Notifications.setNotificationChannelAsync(CHANNEL_ID, CHANNEL);
   }
   const { status } = await Notifications.requestPermissionsAsync();
   return status === 'granted' ? 'granted' : status === 'denied' ? 'denied' : 'undetermined';
@@ -53,14 +58,12 @@ export async function applyPlan(plan: PlannedNotification[]): Promise<number> {
   configure();
   if ((await getPermission()) !== 'granted') return 0;
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-      name: '약·병원 알림',
-      importance: Notifications.AndroidImportance.HIGH,
-    });
+    await Notifications.setNotificationChannelAsync(CHANNEL_ID, CHANNEL);
   }
   await Notifications.cancelAllScheduledNotificationsAsync();
   for (const p of plan) {
-    const content = { title: p.title, body: p.body, data: { url: '/' } };
+    // sound: 'default' — 아이폰은 알림마다 소리를 지정해야 소리가 난다
+    const content = { title: p.title, body: p.body, sound: 'default', data: { url: '/' } };
     const T = Notifications.SchedulableTriggerInputTypes;
     const trigger =
       p.kind === 'daily'
@@ -85,7 +88,7 @@ export async function sendTestNotification(): Promise<boolean> {
   configure();
   if ((await getPermission()) !== 'granted') return false;
   await Notifications.scheduleNotificationAsync({
-    content: { title: '오늘건강 시험 알림', body: '알림이 잘 와요', data: { url: '/' } },
+    content: { title: '💊 오늘건강 시험 알림', body: '알림이 소리와 함께 잘 와요', sound: 'default', data: { url: '/' } },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 10, channelId: CHANNEL_ID },
   } as Notifications.NotificationRequestInput);
   return true;

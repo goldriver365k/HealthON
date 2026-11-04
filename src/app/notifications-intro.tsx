@@ -39,12 +39,12 @@ export default function NotificationsIntroScreen() {
       <Card>
         <AppIcon name="meds" size={40} color={colors.primary} />
         <AppText variant="heading">약 드실 시간에 알려 드려요</AppText>
-        <AppText>등록한 약의 시간에 맞춰 “약 드실 시간이에요” 알림을 보내 드려요.</AppText>
+        <AppText>등록한 약의 시간에 맞춰 소리와 함께 “약 먹을 시간이에요” 알림을 보내 드려요.</AppText>
       </Card>
       <Card>
         <AppIcon name="hospital" size={40} color={colors.primary} />
         <AppText variant="heading">병원 가는 날을 알려 드려요</AppText>
-        <AppText>병원 일정의 전날 저녁 또는 당일 아침에 알려 드려요.</AppText>
+        <AppText>병원 일정의 전날 저녁 또는 당일 아침에 “병원 가는 날이에요” 알림을 보내 드려요.</AppText>
       </Card>
       <AppText tone="sub">
         다음 화면에서 휴대폰이 ‘알림 허용’을 물어봐요. 허용하지 않아도 앱은 그대로 쓸 수 있어요. 잠금화면에는 약 이름이 보이지 않아요.

@@ -2,10 +2,11 @@
  * 어떤 알림을 언제 예약할지 계산 (순수 함수 — 단위 테스트 대상).
  * - 같은 시각·같은 요일의 약은 알림 하나로 묶는다 (아이폰 예약 알림 개수 제한 대비)
  * - 잠금화면에 보이는 문구는 기본적으로 약 이름을 숨긴다 (설정에서 바꿀 수 있음)
- * - ⚠ 알림 문구에 건강 판정·지시를 넣지 않는다 ("드실 시간이에요"만)
+ * - ⚠ 알림 문구에 건강 판정·지시를 넣지 않는다 ("약 먹을 시간이에요"만)
+ * - 병원 알림에는 병원 이름을 넣지 않는다 (잠금화면에 보일 수 있음), 시각만
  */
 import type { AppState } from '@/data/sampleData';
-import { addDays, combineDateAndTime, startOfDay } from '@/utils/date';
+import { addDays, combineDateAndTime, formatTime, startOfDay } from '@/utils/date';
 import { doseSlotLabel } from '@/utils/labels';
 
 export type PlannedNotification =
@@ -40,7 +41,7 @@ export function planNotifications(state: AppState, now: Date = new Date()): Plan
       const [hour, minute] = g.time.split(':').map(Number);
       const slotText = [...g.slots].join('·');
       const body = settings.showMedName ? `${slotText}: ${g.labels.join(', ')}` : `${slotText} 약을 확인해 주세요`;
-      const title = '약 드실 시간이에요';
+      const title = '💊 약 먹을 시간이에요';
       if (g.days.length === 7) {
         out.push({ kind: 'daily', id: `med|${key}`, hour, minute, title, body });
       } else {
@@ -66,8 +67,8 @@ export function planNotifications(state: AppState, now: Date = new Date()): Plan
         kind: 'date',
         id: `apt|${a.id}`,
         date: at,
-        title: a.remindBefore === 'day_before' ? '내일 병원 가는 날이에요' : '오늘 병원 가는 날이에요',
-        body: '오늘건강에서 일정과 물어볼 것을 확인해 보세요',
+        title: a.remindBefore === 'day_before' ? '🏥 내일은 병원 가는 날이에요' : '🏥 오늘은 병원 가는 날이에요',
+        body: `${a.remindBefore === 'day_before' ? '내일' : '오늘'} ${formatTime(visit)} · 오늘건강에서 일정과 물어볼 것을 확인해 보세요`,
       });
     }
   }
