@@ -59,22 +59,47 @@
 
 (또는 Supabase CLI가 있다면: `npx supabase functions deploy delete-account`)
 
-## 5. 앱에 연결
-1. 대시보드 **Project Settings > API** (또는 Data API) 에서
-   - Project URL
+## 5. 앱에 연결 (사용자 컴퓨터에서)
+
+### 5-1. 처음 한 번만: 준비물 설치
+- **Node.js LTS** (https://nodejs.org → LTS 버튼으로 내려받아 설치)
+- **Git** (https://git-scm.com → 내려받아 설치, 설치 중 선택지는 기본값 그대로)
+- 휴대폰에 **Expo Go** 앱 (앱스토어/플레이스토어에서 "Expo Go" 검색, 무료)
+
+### 5-2. 처음 한 번만: 프로젝트 내려받기
+컴퓨터의 터미널(윈도우: "명령 프롬프트" 또는 "PowerShell", 맥: "터미널")을 열고 한 줄씩 입력합니다.
+```bash
+git clone https://github.com/goldriver365k/HealthON.git
+```
+```bash
+cd HealthON
+```
+```bash
+npm install
+```
+(2~5분 걸립니다)
+
+### 5-3. 서버 주소·공개 키 넣기
+1. Supabase 대시보드 **Project Settings > API** (또는 Data API) 에서
+   - **Project URL**
    - **anon / publishable** 키 (공개용)
    를 확인합니다. ⚠ `service_role` / `secret` 키는 **절대 복사하지 마세요.**
-2. 프로젝트 폴더의 `.env.example`을 복사해 `.env`로 저장하고 두 값을 채웁니다.
+2. `HealthON` 폴더 안의 `.env.example` 파일을 복사해서 이름을 `.env`로 바꾸고, 메모장 등으로 열어 두 값을 채운 뒤 저장합니다.
    ```
    EXPO_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
    EXPO_PUBLIC_SUPABASE_ANON_KEY=공개용키
    ```
-   `.env`는 Git에 올라가지 않도록 이미 설정되어 있습니다.
-3. 앱 실행
-   ```bash
-   npx expo start --clear
-   ```
-   → 로그인 화면이 나오면 연결된 것입니다. (값이 비어 있으면 지금처럼 '체험 모드')
+   `.env`는 GitHub에 올라가지 않도록 설정되어 있습니다.
+   - 윈도우에서 파일 이름 앞의 점(.)이 안 보이면: 탐색기 > 보기 > "파일 확장명"과 "숨긴 항목"을 켜 주세요.
+
+### 5-4. 실행
+```bash
+npx expo start --clear
+```
+- 화면에 QR 코드가 나오면 휴대폰으로 찍습니다 (아이폰: 기본 카메라 / 안드로이드: Expo Go 앱의 "Scan QR code")
+- 컴퓨터와 휴대폰이 **같은 와이파이**에 있어야 합니다
+- 첫 화면이 **로그인 화면**이면 서버에 연결된 것입니다. (예시 데이터가 보이면 `.env`가 읽히지 않은 것 → 파일 이름·위치 확인 후 다시 실행)
+- 다음부터는 `HealthON` 폴더에서 `npx expo start`만 하면 됩니다. 새 버전을 받으려면 `git pull` 후 `npm install`
 
 ## 6. 확인할 것 (휴대폰, Expo Go)
 - [ ] 이메일 입력 → 메일로 숫자 6자리 도착 → 입력 → 동의 화면
