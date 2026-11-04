@@ -12,7 +12,7 @@
 > | 2-1. 보안 점검 반영 (`20261105000002_lock_trigger_functions.sql`) | ✅ 2026-11-04 사용자 실행 (Success, 파일과 같은 4줄) | SQL Editor |
 > | 3. 로그인 메일 숫자코드 | ✅ SMTP(Gmail, 개발용) 연결 → 숫자 6자리·10분·메일 제목/문구(`{{ .Token }}`) 적용 확인 (시간당 30통) | 사용자(SMTP) → Claude(API) |
 > | 4. 계정 삭제 함수 | ✅ 배포 완료, 로그인 없이 호출 시 401 거부 확인 | Claude (API) |
-> | 5. 앱 연결 | ⏸ 사용자 컴퓨터에서 `.env` 작성·실행 | 사용자 |
+> | 5. 앱 연결 | ✅ 2026-11-04 Windows PC + 아이폰 Expo Go 연결, 숫자코드 로그인·혈당 저장 확인 (⏸ 6장 나머지 확인 중) | 사용자 |
 >
 > **지역**: 개발 중(가상 데이터)에는 지금 프로젝트를 그대로 써도 됩니다. 단, **실제 건강정보를 넣기 전(4단계)** 에는
 > 서울(ap-northeast-2) 지역으로 새 프로젝트를 만들어 옮깁니다 — 지역은 나중에 바꿀 수 없고, 국외 저장은 개인정보 국외이전 고지 대상이 될 수 있습니다 [전문가 검토].
@@ -118,7 +118,14 @@ npx expo start --clear
 - 다음부터는 `HealthON` 폴더에서 `npx expo start`만 하면 됩니다. 새 버전을 받으려면 `git pull` 후 `npm install`
 
 ## 6. 확인할 것 (휴대폰, Expo Go)
-- [ ] 이메일 입력 → 메일로 숫자 6자리 도착 → 입력 → 동의 화면
+> **Windows에서 겪은 문제와 해결 (2026-11-04)**
+> - `npm` 실행 막힘(PSSecurityException) → `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+> - 프로젝트를 OneDrive 폴더에 두지 않기 → `C:\Users\<이름>\HealthON`
+> - `.env`의 URL은 `https://<ref>.supabase.co`까지만 (`/rest/v1/` 붙이지 않기)
+> - iOS Expo Go "signed in to Expo CLI" 오류 → `npx expo login` 실패 시 expo.dev 접근 토큰을 `$env:EXPO_TOKEN="…"`(따옴표 필수, 창마다 다시)
+> - 밖에서 열기: `npx expo start --tunnel` + PC 절전 '안 함' (PC가 켜져 있어야 함)
+
+- [x] 이메일 입력 → 메일로 숫자 6자리 도착 → 입력 → 동의 화면 (2026-11-04 확인)
 - [ ] 동의 4개 체크 → [동의하고 시작하기] → 알림 안내 화면 → 오늘 화면 (빈 화면)
 - [ ] 약 1개 등록(시간을 2~3분 뒤로) → **알림이 오는지** → 알림 누르면 오늘 화면
 - [ ] 혈압 기록 → 앱 완전히 종료 후 다시 열기 → 기록이 남아 있는지
