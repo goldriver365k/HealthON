@@ -20,7 +20,11 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
   권한: 프로젝트 설정 읽기, 자문가 읽기, API 키 읽기(비밀 없음), 인증 구성 읽기/쓰기, DB 읽기, 엣지 함수 읽기/쓰기. 만료 2026-11-05.
   - 인증 메일 설정(`PATCH /config/auth`)은 `project_admin_write`가 필요해 토큰으로 불가 → 사용자가 대시보드에서 설정
 - 완료: DB 적용 확인(표 14·RLS 14), 보안 자문가 확인, `delete-account` 배포(401 확인), 공개용 키 확인
-- 남음(사용자): `20261105000002_lock_trigger_functions.sql` 실행, 로그인 메일 숫자코드·6자리·10분 설정, `.env` 작성 후 휴대폰 확인, 끝나면 토큰·네트워크 시크릿 삭제
+- **다음 세션 첫 작업 (사용자가 "Supabase 메일 설정 이어서"라고 하면)**: 사용자가 프로젝트 설정 '읽기/쓰기'가 추가된 새 토큰(`claude-setup2`)을 네트워크 시크릿에 넣었다.
+  `curl -X PATCH https://api.supabase.com/v1/projects/ufwqvfodqypbzrmdzdsq/config/auth -H 'Content-Type: application/json' --data-binary @supabase/setup/auth_email_settings.json`
+  → 다시 GET 해서 mailer_otp_length=6, mailer_otp_exp=600, 두 템플릿에 `{{ .Token }}` 포함 확인 → 사용자에게 **두 토큰 모두 삭제 + 네트워크 시크릿 삭제** 안내 (위험 등급 권한).
+  401 "Format is Authorization: Bearer" 이면 시크릿이 주입되지 않은 것 → 사용자에게 시크릿 설정 확인 요청.
+- 남음(사용자): `20261105000002_lock_trigger_functions.sql` 실행(SQL 4줄), `.env` 작성 후 휴대폰 확인
 
 ## 작업 규칙
 1. 작업 전에 관련 파일을 먼저 읽고 확인한다.
