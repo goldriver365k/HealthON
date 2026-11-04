@@ -26,6 +26,7 @@ export const colors = {
   sampleText: '#5E4511',
 
   tabInactive: '#4A5160',
+  overlay: 'rgba(28, 36, 51, 0.5)', // 달력 등 큰 창 뒤 어둡게
 } as const;
 
 export type ColorName = keyof typeof colors;

@@ -102,3 +102,28 @@ describe('기록 요약 (평균·최저·최고·기록한 날만)', () => {
     expect(v[5].value).toBeNull();
   });
 });
+
+describe('병원 가는 날: 달 단위 이동·달력 칸', () => {
+  const { addMonths, monthGrid, formatYearMonth } = require('../date') as typeof import('../date');
+
+  it('한 달 뒤로: 같은 날, 없으면 그달 마지막 날', () => {
+    expect(addMonths(new Date(2026, 10, 4, 10, 30), 1)).toEqual(new Date(2026, 11, 4, 10, 30));
+    expect(addMonths(new Date(2026, 0, 31), 1)).toEqual(new Date(2026, 1, 28));
+    expect(addMonths(new Date(2028, 0, 31), 1)).toEqual(new Date(2028, 1, 29));
+    expect(addMonths(new Date(2026, 11, 15), 1)).toEqual(new Date(2027, 0, 15));
+    expect(addMonths(new Date(2026, 2, 31), -1)).toEqual(new Date(2026, 1, 28));
+  });
+
+  it('달력 칸: 일요일 시작, 7칸씩, 날짜 수 맞음', () => {
+    const weeks = monthGrid(2026, 10); // 2026년 11월 1일은 일요일
+    expect(weeks.every((w) => w.length === 7)).toBe(true);
+    expect(weeks[0][0]).toEqual(new Date(2026, 10, 1));
+    expect(weeks.flat().filter(Boolean)).toHaveLength(30);
+    const feb = monthGrid(2026, 1); // 2026년 2월 1일 일요일, 28일 → 딱 4주
+    expect(feb).toHaveLength(4);
+    const dec = monthGrid(2026, 11); // 12월 1일 화요일 → 앞 2칸 비움
+    expect(dec[0][0]).toBeNull();
+    expect(dec[0][2]).toEqual(new Date(2026, 11, 1));
+    expect(formatYearMonth(new Date(2026, 10, 4))).toBe('2026년 11월');
+  });
+});

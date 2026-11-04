@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { colors, sizes, spacing } from '@/theme';
 import { AppButton } from './AppButton';
@@ -11,23 +11,45 @@ interface StepperProps {
   /** 스크린리더용 값 */
   spokenValue?: string;
   steps: { label: string; onPress: () => void; hint?: string }[];
+  /** 값 칸을 눌렀을 때 (예: 달력 열기). 있으면 값 칸이 버튼이 된다 */
+  onPressValue?: () => void;
+  /** 값 칸 아래 안내 글 (예: "누르면 달력이 열려요") */
+  valueHint?: string;
 }
 
 /**
  * 날짜·시각 조정. 달력·시계 휠 대신 큰 버튼(-1시간, +10분 등)으로 조정한다.
  * (추가 패키지 없이 구현, 어르신이 작은 휠을 돌리지 않아도 됨)
  */
-export function Stepper({ label, valueText, spokenValue, steps }: StepperProps) {
+export function Stepper({ label, valueText, spokenValue, steps, onPressValue, valueHint }: StepperProps) {
   return (
     <View style={styles.wrap}>
       <AppText variant="label" bold>
         {label}
       </AppText>
-      <View style={styles.valueBox} accessible accessibilityLabel={`${label}: ${spokenValue ?? valueText}`}>
-        <AppText variant="number" center>
-          {valueText}
-        </AppText>
-      </View>
+      {onPressValue ? (
+        <Pressable
+          onPress={onPressValue}
+          accessibilityRole="button"
+          accessibilityLabel={`${label}: ${spokenValue ?? valueText}`}
+          accessibilityHint={valueHint}
+          style={({ pressed }) => [styles.valueBox, styles.valueButton, pressed && styles.pressed]}>
+          <AppText variant="number" center>
+            {valueText}
+          </AppText>
+          {valueHint ? (
+            <AppText tone="primary" bold center>
+              {valueHint}
+            </AppText>
+          ) : null}
+        </Pressable>
+      ) : (
+        <View style={styles.valueBox} accessible accessibilityLabel={`${label}: ${spokenValue ?? valueText}`}>
+          <AppText variant="number" center>
+            {valueText}
+          </AppText>
+        </View>
+      )}
       <View style={styles.grid}>
         {steps.map((s) => (
           <AppButton
@@ -53,6 +75,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     paddingVertical: spacing.md,
   },
+  valueButton: { borderColor: colors.primary },
+  pressed: { backgroundColor: colors.surfaceMuted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   step: { flexBasis: '47%', flexGrow: 1 },
 });

@@ -2,9 +2,9 @@
 import { useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AppButton, AppText, ChoiceButtons, Card, Notice, Screen, Stepper, TextField } from '@/components/ui';
+import { AppButton, AppText, CalendarModal, ChoiceButtons, Card, Notice, Screen, Stepper, TextField } from '@/components/ui';
 import type { AppointmentInput, RemindBefore } from '@/types/domain';
-import { addDays, addMinutes, formatLongDate, formatRelativeDate, formatTime, startOfDay } from '@/utils/date';
+import { addDays, addMinutes, addMonths, formatLongDate, formatRelativeDate, formatTime, startOfDay } from '@/utils/date';
 import { remindBeforeLabel } from '@/utils/labels';
 import { checkText } from '@/utils/validate';
 import { spacing } from '@/theme';
@@ -36,6 +36,7 @@ export function AppointmentForm({ title, initial, onSubmit, extra }: Props) {
   const [remindBefore, setRemindBefore] = useState<RemindBefore>(initial?.remindBefore ?? 'day_before');
   const [memo, setMemo] = useState(initial?.memo ?? '');
   const [nameError, setNameError] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const setDay = (day: Date) => {
     const next = new Date(day);
@@ -56,8 +57,6 @@ export function AppointmentForm({ title, initial, onSubmit, extra }: Props) {
     });
   };
 
-  const today = startOfDay(new Date());
-
   return (
     <Screen title={title} showBack footer={<AppButton label="저장하기" onPress={submit} large testID="save" />}>
       <TextField label="병원 이름" value={hospitalName} onChangeText={setHospitalName} maxLength={40} error={nameError} testID="hospital" />
@@ -68,18 +67,30 @@ export function AppointmentForm({ title, initial, onSubmit, extra }: Props) {
           label="가는 날"
           valueText={`${formatRelativeDate(visitAt)}`}
           spokenValue={formatLongDate(visitAt)}
+          onPressValue={() => setCalendarOpen(true)}
+          valueHint="누르면 달력이 열려요"
           steps={[
-            { label: '오늘', onPress: () => setDay(today) },
-            { label: '내일', onPress: () => setDay(addDays(today, 1)) },
-            { label: '하루 앞으로', onPress: () => setDay(addDays(startOfDay(visitAt), -1)) },
-            { label: '하루 뒤로', onPress: () => setDay(addDays(startOfDay(visitAt), 1)) },
-            { label: '일주일 뒤로', onPress: () => setDay(addDays(startOfDay(visitAt), 7)) },
+            { label: '1주 앞으로', onPress: () => setDay(addDays(startOfDay(visitAt), -7)) },
+            { label: '1주 뒤로', onPress: () => setDay(addDays(startOfDay(visitAt), 7)) },
+            { label: '1달 앞으로', onPress: () => setDay(addMonths(startOfDay(visitAt), -1)) },
+            { label: '1달 뒤로', onPress: () => setDay(addMonths(startOfDay(visitAt), 1)) },
           ]}
         />
         <AppText tone="sub" center>
           {formatLongDate(visitAt)}
         </AppText>
+        <AppButton label="달력에서 날짜 고르기" icon="calendar" large onPress={() => setCalendarOpen(true)} />
       </Card>
+      <CalendarModal
+        visible={calendarOpen}
+        title="병원 가는 날 고르기"
+        value={visitAt}
+        onSelect={(day) => {
+          setDay(day);
+          setCalendarOpen(false);
+        }}
+        onClose={() => setCalendarOpen(false)}
+      />
 
       <Card>
         <Stepper

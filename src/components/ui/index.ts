@@ -1,6 +1,7 @@
 export { AppButton } from './AppButton';
 export { AppIcon } from './AppIcon';
 export { AppText } from './AppText';
+export { CalendarModal } from './CalendarModal';
 export { Card } from './Card';
 export { ChoiceButtons, type Choice } from './ChoiceButtons';
 export { ListRow } from './ListRow';

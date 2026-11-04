@@ -29,6 +29,39 @@ export function addDays(d: Date, days: number): Date {
   return r;
 }
 
+/** 달 더하기. 다음 달에 같은 날이 없으면 그달 마지막 날 (1월 31일 + 1달 → 2월 28/29일) */
+export function addMonths(d: Date, months: number): Date {
+  const r = new Date(d);
+  const day = r.getDate();
+  r.setDate(1);
+  r.setMonth(r.getMonth() + months);
+  const last = new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate();
+  r.setDate(Math.min(day, last));
+  return r;
+}
+
+/**
+ * 달력 칸 계산: 일요일부터 시작하는 주(7칸) 목록. 그달이 아닌 칸은 null.
+ * month는 0(1월)~11(12월).
+ */
+export function monthGrid(year: number, month: number): (Date | null)[][] {
+  const first = new Date(year, month, 1);
+  const days = new Date(year, month + 1, 0).getDate();
+  const cells: (Date | null)[] = Array.from({ length: first.getDay() }, () => null);
+  for (let i = 1; i <= days; i++) cells.push(new Date(year, month, i));
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks: (Date | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+}
+
+/** "2026년 11월" */
+export function formatYearMonth(d: Date): string {
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+}
+
+export const WEEKDAY_NAMES = WEEKDAYS;
+
 export function addMinutes(d: Date, minutes: number): Date {
   return new Date(d.getTime() + minutes * 60_000);
 }
