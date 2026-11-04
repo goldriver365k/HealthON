@@ -2,13 +2,14 @@
  * ② 건강기록 — 혈압·혈당·체중 목록, 최근 7일·30일 요약, 수정·삭제, 약 확인 요약(3단계)
  * ⚠ 요약은 평균·최저·최고·기록한 날 수만. 판정 문구 없음.
  */
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppButton, AppText, Card, ChoiceButtons, EmptyState, ListRow, SampleBadge, Screen } from '@/components/ui';
 import { MedsSummary } from '@/features/records/MedsSummary';
 import { SimpleBars } from '@/features/records/SimpleBars';
+import { StepsRecords } from '@/features/steps/StepsRecords';
 import { useAppState } from '@/data/store';
 import { useNow } from '@/hooks/useNow';
 import type { Measurement, MeasurementKind } from '@/types/domain';
@@ -17,10 +18,11 @@ import { formatShortDate, formatTime } from '@/utils/date';
 import { glucoseTimingLabel, kindLabel, kindUnit, measurementSpokenText, measurementValueText } from '@/utils/labels';
 import { dailyValues, filterRecentDays, summarizePeriod, type PeriodSummary } from '@/utils/stats';
 
-type RecordView = MeasurementKind | 'meds';
+type RecordView = MeasurementKind | 'meds' | 'steps';
 const viewOptions: { value: RecordView; label: string }[] = [
   ...(['bp', 'glucose', 'weight'] as const).map((value) => ({ value, label: kindLabel[value] })),
   { value: 'meds', label: '약' },
+  { value: 'steps', label: '걸음' },
 ];
 const periodOptions = [
   { value: 7, label: '최근 7일' },
@@ -86,8 +88,13 @@ function RecordRow({ m }: { m: Measurement }) {
 export default function RecordsScreen() {
   const state = useAppState();
   const now = useNow();
+  const params = useLocalSearchParams<{ view?: string }>();
   const [view, setView] = useState<RecordView>('bp');
-  const kind: MeasurementKind = view === 'meds' ? 'bp' : view;
+  // 오늘 화면의 걸음 카드에서 들어오면 걸음 보기
+  useEffect(() => {
+    if (params.view === 'steps') setView('steps');
+  }, [params.view]);
+  const kind: MeasurementKind = view === 'meds' || view === 'steps' ? 'bp' : view;
   const [days, setDays] = useState<7 | 30>(7);
 
   const summary = summarizePeriod(state.measurements, kind, days, now);
@@ -103,9 +110,11 @@ export default function RecordsScreen() {
   return (
     <Screen title="건강기록" showSettings>
       <ChoiceButtons options={viewOptions} value={view} onChange={setView} columns={2} />
-      <ChoiceButtons options={periodOptions} value={days} onChange={(v) => setDays(v)} />
+      {view === 'steps' ? null : <ChoiceButtons options={periodOptions} value={days} onChange={(v) => setDays(v)} />}
 
-      {view === 'meds' ? (
+      {view === 'steps' ? (
+        <StepsRecords now={now} />
+      ) : view === 'meds' ? (
         <MedsSummary days={days} now={now} />
       ) : (
         <>

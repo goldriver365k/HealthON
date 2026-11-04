@@ -211,3 +211,10 @@ export interface ConsentRecord {
   agreedAt: IsoDateTime;
   withdrawnAt?: IsoDateTime;
 }
+
+/** 만보기: 날짜별 걸음 수 합계 (DB: daily_steps). 휴대폰 동작 기록에서 읽어 저장 */
+export interface DailySteps {
+  date: DateKey;
+  steps: number;
+  source: DataSource;
+}

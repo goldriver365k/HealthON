@@ -5,6 +5,7 @@
 import type {
   Appointment,
   AppointmentInput,
+  DailySteps,
   DateKey,
   FamilyLink,
   IntakeStatus,
@@ -47,6 +48,7 @@ export type Action =
   | { type: 'contact/delete'; id: string }
   | { type: 'settings/fontScale'; scale: number }
   | { type: 'settings/notifications'; next: NotificationSettings }
+  | { type: 'steps/upsert'; items: DailySteps[] }
   | { type: 'reset' };
 
 function buildSchedules(medicationId: string, input: MedicationInput): MedicationSchedule[] {
@@ -252,6 +254,13 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, settings: { ...state.settings, fontScale: action.scale } };
     case 'settings/notifications':
       return { ...state, notificationSettings: action.next };
+
+    case 'steps/upsert': {
+      // 같은 날짜는 새 값으로 바꾸고, 날짜 순으로 정렬 (최근이 앞)
+      const byDate = new Map(state.dailySteps.map((d) => [d.date, d]));
+      for (const item of action.items) byDate.set(item.date, item);
+      return { ...state, dailySteps: [...byDate.values()].sort((a, b) => (a.date < b.date ? 1 : -1)) };
+    }
 
     case 'reset':
       // 글씨 크기·알림 설정은 유지

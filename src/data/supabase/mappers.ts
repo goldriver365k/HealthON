@@ -7,6 +7,7 @@ import type {
   AppointmentQuestion,
   ConsentRecord,
   ConsentType,
+  DailySteps,
   DoseSlot,
   EmergencyContact,
   FamilyLink,
@@ -130,6 +131,10 @@ export function toContact(r: Row): EmergencyContact {
     priority: r.priority,
     source: src(r.source),
   };
+}
+
+export function toDailySteps(r: Row): DailySteps {
+  return { date: String(r.step_date).slice(0, 10), steps: Number(r.steps), source: r.source };
 }
 
 export function toNotificationSettings(r: Row | null): NotificationSettings {

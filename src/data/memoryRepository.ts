@@ -85,5 +85,7 @@ export function createMemoryRepository(dispatch: Dispatch<Action>): Repository {
     setFontScale: (scale) => run({ type: 'settings/fontScale', scale }),
     updateNotificationSettings: (next) => run({ type: 'settings/notifications', next }),
     resetSampleData: () => run({ type: 'reset' }),
+    // 체험 모드: 실제 걸음 수를 읽었으면 화면에만 반영 (앱을 다시 켜면 사라짐)
+    saveDailySteps: (items) => run({ type: 'steps/upsert', items: items.map((i) => ({ ...i, source: 'real' as const })) }),
   };
 }

@@ -12,6 +12,7 @@ import { LoadingView } from '@/components/ui/LoadingView';
 import { AuthProvider, useAuth } from '@/data/auth';
 import { AppDataProvider, useDataStatus } from '@/data/store';
 import { NotificationSync } from '@/notifications/NotificationSync';
+import { StepSync } from '@/steps/StepSync';
 import { colors } from '@/theme';
 
 const APP_SCREENS = [
@@ -55,6 +56,7 @@ function DataGate() {
   return (
     <>
       <NotificationSync />
+      <StepSync />
       <RootStack signedIn ready />
     </>
   );

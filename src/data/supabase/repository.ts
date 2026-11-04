@@ -18,6 +18,7 @@ import {
   toAppointment,
   scopeArgs,
   toContact,
+  toDailySteps,
   toFamilyLink,
   toIntake,
   toMeasurement,
@@ -29,6 +30,7 @@ import {
 } from './mappers';
 
 const LOAD_DAYS = 90; // 처음에 불러오는 기록 기간 (통계는 최근 30일까지)
+const STEPS_LOAD_DAYS = 400; // 걸음 수는 월별 기록(최근 12달)까지 보여 주므로 더 길게
 
 /** 사용자에게 보여줄 오류 문장 */
 import { UserFacingError } from '../errors';
@@ -63,7 +65,8 @@ export async function loadAll(): Promise<Partial<AppState>> {
   const sb = getSupabase();
   const since = new Date(Date.now() - LOAD_DAYS * 86_400_000).toISOString();
   const sinceDate = since.slice(0, 10);
-  const [profile, measurements, meds, schedules, intakes, appointments, questions, contacts, notif] = await Promise.all([
+  const stepsSince = new Date(Date.now() - STEPS_LOAD_DAYS * 86_400_000).toISOString().slice(0, 10);
+  const [profile, measurements, meds, schedules, intakes, appointments, questions, contacts, notif, steps] = await Promise.all([
     must(sb.from('profiles').select('display_name, font_scale').maybeSingle()),
     must(sb.from('health_measurements').select('*').gte('measured_at', since).order('measured_at', { ascending: false })),
     must(sb.from('medications').select('*').order('created_at')),
@@ -73,6 +76,7 @@ export async function loadAll(): Promise<Partial<AppState>> {
     must(sb.from('appointment_questions').select('*')),
     must(sb.from('emergency_contacts').select('*').order('priority')),
     must(sb.from('notification_settings').select('*').maybeSingle()),
+    must(sb.from('daily_steps').select('step_date, steps, source').gte('step_date', stepsSince).order('step_date', { ascending: false })),
   ]);
   return {
     settings: {
@@ -87,6 +91,7 @@ export async function loadAll(): Promise<Partial<AppState>> {
     questions: (questions as any[]).map(toQuestion),
     emergencyContacts: (contacts as any[]).map(toContact),
     notificationSettings: toNotificationSettings(notif as any),
+    dailySteps: (steps as any[]).map(toDailySteps),
     familyLinks: await loadFamilyLinks(),
     sharedSummaries: [], // 가족 정보는 화면을 열 때만 불러온다 (최소 조회 + 열람 기록 정확도)
   };
@@ -335,6 +340,22 @@ export function createCloudRepository(dispatch: Dispatch<Action>, getState: () =
           .eq('user_id', uid),
       );
       dispatch({ type: 'settings/notifications', next });
+    },
+    async saveDailySteps(items) {
+      if (!items.length) return;
+      // 바뀐 날만 저장 (앱을 열 때마다 같은 값을 다시 쓰지 않도록)
+      const known = new Map(getState().dailySteps.map((d) => [d.date, d.steps]));
+      const changed = items.filter((i) => known.get(i.date) !== i.steps);
+      if (!changed.length) return;
+      await must(
+        sb()
+          .from('daily_steps')
+          .upsert(
+            changed.map((i) => ({ step_date: i.date, steps: i.steps })),
+            { onConflict: 'user_id,step_date' },
+          ),
+      );
+      dispatch({ type: 'steps/upsert', items: changed.map((i) => ({ ...i, source: 'real' as const })) });
     },
     async resetSampleData() {
       // 서버 모드에는 예시 데이터가 없다

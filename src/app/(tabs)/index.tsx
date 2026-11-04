@@ -6,6 +6,7 @@ import { AppButton, AppIcon, AppText, Card, Notice, SampleBadge, Screen, StatusM
 import { dataMode } from '@/data/config';
 import { DoseRow } from '@/features/today/DoseRow';
 import { NotificationReminder } from '@/features/today/NotificationReminder';
+import { StepsToday } from '@/features/steps/StepsToday';
 import { appointmentsOnDate, dosesForDate, latestOnDate, questionsOf, todayProgress } from '@/data/selectors';
 import { useAppState } from '@/data/store';
 import { useNow } from '@/hooks/useNow';
@@ -112,6 +113,9 @@ export default function TodayScreen() {
           testID="go-glucose"
         />
       </Card>
+
+      {/* 걸음 */}
+      <StepsToday now={now} />
 
       {/* 오늘 진료 (있을 때만) */}
       {appointments.map((a) => {

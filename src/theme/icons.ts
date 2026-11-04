@@ -26,6 +26,7 @@ export const icons = {
   next: { ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' },
   back: { ios: 'chevron.left', android: 'chevron_left', web: 'chevron_left' },
   info: { ios: 'info.circle', android: 'info', web: 'info' },
+  steps: { ios: 'figure.walk', android: 'directions_walk', web: 'directions_walk' },
 } as const satisfies Record<string, SymbolViewProps['name']>;
 
 export type IconName = keyof typeof icons;

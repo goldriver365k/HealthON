@@ -7,6 +7,7 @@
  */
 import type {
   AppointmentInput,
+  DailySteps,
   DateKey,
   FamilyInviteInput,
   FamilyInviteResult,
@@ -54,6 +55,9 @@ export interface Repository {
   // 긴급 연락처
   addEmergencyContact(input: { name: string; phone: string; relationLabel?: string }): Promise<void>;
   deleteEmergencyContact(id: string): Promise<void>;
+
+  // 만보기: 휴대폰에서 읽은 날짜별 걸음 수 저장 (같은 날짜는 덮어씀). 화면이 아닌 동기화 부품만 호출
+  saveDailySteps(items: Pick<DailySteps, 'date' | 'steps'>[]): Promise<void>;
 
   // 설정
   setFontScale(scale: number): Promise<void>;

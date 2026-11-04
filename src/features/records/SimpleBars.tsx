@@ -16,7 +16,8 @@ export function SimpleBars({
   caption,
   fromZero,
 }: {
-  data: { dateKey: string; value: number | null }[];
+  /** label: 막대 아래 글 (없으면 날짜의 '일') */
+  data: { dateKey: string; value: number | null; label?: string }[];
   caption: string;
   fromZero?: boolean;
 }) {
@@ -46,7 +47,7 @@ export function SimpleBars({
             </View>
             {(data.length - 1 - i) % showEvery === 0 ? (
               <AppText variant="caption" tone="sub" maxFontSizeMultiplier={1} style={styles.day}>
-                {fromDateKey(d.dateKey).getDate()}
+                {d.label ?? fromDateKey(d.dateKey).getDate()}
               </AppText>
             ) : (
               <View style={styles.dayPlaceholder} />

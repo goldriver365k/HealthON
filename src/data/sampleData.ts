@@ -7,6 +7,7 @@
 import type {
   Appointment,
   AppointmentQuestion,
+  DailySteps,
   EmergencyContact,
   FamilyLink,
   Measurement,
@@ -31,6 +32,8 @@ export interface AppState {
   sharedSummaries: SharedSummary[];
   emergencyContacts: EmergencyContact[];
   notificationSettings: NotificationSettings;
+  /** 만보기: 날짜별 걸음 수 */
+  dailySteps: DailySteps[];
 }
 
 export const defaultNotificationSettings: NotificationSettings = {
@@ -53,6 +56,7 @@ export function createEmptyState(): AppState {
     sharedSummaries: [],
     emergencyContacts: [],
     notificationSettings: defaultNotificationSettings,
+    dailySteps: [],
   };
 }
 
@@ -218,6 +222,13 @@ export function createSampleState(now: Date = new Date()): AppState {
     { id: 's-ec-1', name: '김예솔', phone: '010-0000-0000', relationLabel: '딸', priority: 1, source: 'sample' },
   ];
 
+  // 걸음 수 예시: 최근 60일 (오늘은 아직 덜 걸은 상태)
+  const dailySteps: DailySteps[] = Array.from({ length: 60 }, (_, i) => ({
+    date: toDateKey(day(i)),
+    steps: i === 0 ? 2350 : 3800 + ((i * 2731) % 5200),
+    source: 'sample' as const,
+  }));
+
   return {
     settings: { displayName: '김예시', fontScale: 1 },
     measurements,
@@ -230,5 +241,6 @@ export function createSampleState(now: Date = new Date()): AppState {
     sharedSummaries,
     emergencyContacts,
     notificationSettings: defaultNotificationSettings,
+    dailySteps,
   };
 }

@@ -33,7 +33,13 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "걸음 수를 기록하려고 휴대폰의 동작 및 피트니스 기록을 읽어요."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

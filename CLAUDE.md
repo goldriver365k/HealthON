@@ -24,6 +24,7 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
   ✅ 토큰 삭제 확인(2026-11-04, API 401). 이후 Supabase API 작업이 필요하면 사용자에게 새 토큰을 요청. 4단계(서울 새 프로젝트)에서는 Gmail 대신 도메인 연결된 발송 서비스로 교체.
 - ✅ `20261105000002_lock_trigger_functions.sql` 사용자 실행 완료(2026-11-04).
 - ✅ 휴대폰 연결(2026-11-04): Windows PC + 아이폰 Expo Go, 숫자코드 로그인·혈당 저장 확인. Windows 문제·해결은 SUPABASE_SETUP.md 6장.
+- 만보기(2026-11-04 승인): `expo-sensors` 설치, `daily_steps` 표(마이그레이션 20261106000001, DB 시험 40_daily_steps). 아이폰만 지원(최근 7일 읽어 저장), 안드로이드는 정식 빌드 후 헬스 커넥트. ⏸ 사용자가 SQL 실행 필요.
 - 남음(사용자): 6장 나머지(재실행 후 기록 유지·알림·계정 삭제·오프라인) + 가족 공유(계정 2개)
 
 ## 작업 규칙
@@ -69,6 +70,7 @@ src/features/       기능별 양식·부품 (records, meds, appointments, today
 src/data/           repository.ts(약속) · store.tsx(모드 선택) · reducer.ts · memoryRepository.ts(체험)
                     supabase/(서버 저장) · auth.tsx(로그인·동의) · config.ts · sampleData.ts · selectors.ts
 src/notifications/  알림 계획(plan.ts)·예약(scheduler.ts)
+src/steps/          만보기: 휴대폰 걸음 읽기(pedometer.ts)·저장(StepSync)·일/주/월 묶기(stats.ts)
 supabase/           migrations(실제 적용) · functions(서버 함수) · tests(시험 전용, 실제 적용 금지)
 src/theme/          색·글씨·간격·아이콘
 src/types/          domain.ts (DB 설계와 같은 이름)
