@@ -15,12 +15,20 @@
    - Plan: Free
 3. 만들어지는 데 1~2분 걸립니다.
 
-## 2. DB 설계 적용 (테이블·보안 규칙·감사기록)
-가장 쉬운 방법: 대시보드의 **SQL Editor**에 아래 파일 4개의 내용을 **순서대로** 하나씩 붙여넣고 [Run]
-1. `supabase/migrations/20261104000001_core_schema.sql`
-2. `supabase/migrations/20261104000002_rls.sql`
-3. `supabase/migrations/20261104000003_audit.sql`
-4. `supabase/migrations/20261105000001_family_sharing.sql` (3단계: 가족 공유)
+## 2. DB 설계 적용 (테이블·보안 규칙·감사기록·가족 공유)
+⚠ SQL Editor에는 파일 **경로가 아니라 파일 안의 내용**을 붙여넣어야 합니다.
+(경로를 붙여넣으면 `syntax error at or near "supabase"` 오류가 납니다. 이 오류가 났다면 아무것도 적용되지 않은 것이니 그냥 다시 하시면 됩니다.)
+
+**가장 쉬운 방법 — 파일 하나를 한 번에**
+1. 컴퓨터 브라우저에서 아래 주소를 엽니다
+   https://github.com/goldriver365k/HealthON/blob/main/supabase/setup/all_in_one.sql
+2. 코드 오른쪽 위의 **복사 버튼(Copy raw file, 네모 두 개 모양)**을 누릅니다
+3. Supabase 대시보드 왼쪽 **SQL Editor** → 새 쿼리(**+ New query**) → 빈 칸에 **붙여넣기**(Ctrl+V)
+4. 오른쪽 아래 **Run** 한 번 → 아래쪽에 `Success. No rows returned`가 나오면 완료
+   - "이 쿼리는 위험할 수 있다"(destructive operation) 같은 확인창이 뜨면, 표 권한을 정리하는 문장 때문이므로 **실행(Run this query)**을 누르면 됩니다 [추정: 문구는 대시보드 버전에 따라 다를 수 있음]
+5. ⚠ **한 번만** 실행하세요. 두 번 실행하면 "already exists(이미 있음)" 오류가 납니다 — 그 경우 이미 적용된 것이니 다음 단계로 넘어가면 됩니다.
+
+(같은 내용을 4개 파일로 나눠 둔 것이 `supabase/migrations/` 폴더입니다. 나중에 DB를 바꿀 때 쓰는 원본이고, 지금은 위의 합친 파일만 쓰면 됩니다.)
 
 > ⚠ `supabase/tests/` 폴더의 파일은 **시험 전용**입니다. 실제 Supabase에 넣지 마세요.
 

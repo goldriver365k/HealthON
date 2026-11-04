@@ -74,5 +74,5 @@ npm test                  # 단위 테스트
 npm run test:db           # DB 보안 시험 (로컬 PostgreSQL 필요)
 ```
 - `.env`에 `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`가 있으면 서버 모드, 없으면 체험 모드.
-- DB를 바꾸면 새 마이그레이션 파일을 추가하고(기존 파일 수정 금지), `supabase/tests`에 시험을 추가한다.
+- DB를 바꾸면 새 마이그레이션 파일을 추가하고(기존 파일 수정 금지), `supabase/tests`에 시험을 추가한 뒤 `bash scripts/build-setup-sql.sh`로 `supabase/setup/all_in_one.sql`(붙여넣기용)을 다시 만든다.
 `npx expo lint`는 처음 실행 시 ESLint 설정 패키지를 설치하므로, 도입 전에 승인을 받는다.
