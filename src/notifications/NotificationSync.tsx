@@ -6,6 +6,7 @@
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
+import { AppState as RNAppState } from 'react-native';
 
 import { useAppState } from '@/data/store';
 import { planNotifications } from './plan';
@@ -33,6 +34,18 @@ export function NotificationSync() {
   useEffect(() => {
     if (!notificationsSupported) return;
     const sub = Notifications.addNotificationResponseReceivedListener(() => router.navigate('/'));
+    return () => sub.remove();
+  }, []);
+
+  // 앱으로 돌아올 때마다 다시 예약
+  // (알림 허용 창·휴대폰 설정에서 권한을 바꾼 뒤에도, 이미 등록한 약이 바로 예약되도록)
+  const latest = useRef(state);
+  latest.current = state;
+  useEffect(() => {
+    if (!notificationsSupported) return;
+    const sub = RNAppState.addEventListener('change', (s) => {
+      if (s === 'active') applyPlan(planNotifications({ ...latest.current })).catch(() => {});
+    });
     return () => sub.remove();
   }, []);
 
