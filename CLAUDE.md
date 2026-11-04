@@ -14,14 +14,13 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
 - 각 단계가 끝날 때마다 `docs/PHASEn_REPORT.md`로 결과를 남긴다.
 - 유료 서비스·배포·스토어 제출은 자동 진행 대상이 아니다 (항상 승인 필요).
 
-### 다음 세션 할 일: Supabase 설정 이어서 (사용자 요청 시)
-- 사용자가 Supabase 토큰을 **네트워크 시크릿**(Bearer, 허용 웹사이트 `api.supabase.com`, 경로 `/v1/`)으로 넣었다.
-  → 환경변수에는 없다. `https://api.supabase.com/v1/...`로 요청하면 프록시가 토큰을 붙인다. 토큰을 출력·저장하지 않는다.
-- 토큰 권한(프로젝트 1개): 프로젝트 설정 읽기, 자문가 읽기, API 키 읽기(비밀 키 없음), 인증 구성 읽기/쓰기, 데이터베이스 읽기, 엣지 함수 읽기/쓰기. 만료 2026-11-05.
-- 할 일: ① 프로젝트 ref 확인 ② SQL 적용 확인(표 14개·RLS — 사용자가 all_in_one.sql을 이미 실행함) ③ 보안 자문가 경고 확인
-  ④ 인증: Magic Link 메일 제목·본문을 숫자코드({{ .Token }})로, OTP 6자리 ⑤ Edge Function `delete-account` 배포
-  ⑥ 공개용(anon/publishable) 키와 URL을 사용자에게 알려 `.env` 작성 안내 (service_role/secret 키는 절대 다루지 않음)
-- 끝나면: 사용자에게 Supabase 토큰 삭제(Revoke) + Claude 환경의 네트워크 시크릿 삭제를 안내.
+### Supabase 설정 진행 상황 (2026-11-05) — 자세한 표: docs/SUPABASE_SETUP.md 맨 위
+- 개발용 프로젝트 ref `ufwqvfodqypbzrmdzdsq` (⚠ 지역 ap-south-1 뭄바이 → 실제 데이터 전 서울로 새 프로젝트, 4단계)
+- 토큰은 **네트워크 시크릿**(Bearer, `api.supabase.com`, `/v1/`)으로 주입됨. 환경변수 없음. 토큰 값을 출력·저장하지 않는다.
+  권한: 프로젝트 설정 읽기, 자문가 읽기, API 키 읽기(비밀 없음), 인증 구성 읽기/쓰기, DB 읽기, 엣지 함수 읽기/쓰기. 만료 2026-11-05.
+  - 인증 메일 설정(`PATCH /config/auth`)은 `project_admin_write`가 필요해 토큰으로 불가 → 사용자가 대시보드에서 설정
+- 완료: DB 적용 확인(표 14·RLS 14), 보안 자문가 확인, `delete-account` 배포(401 확인), 공개용 키 확인
+- 남음(사용자): `20261105000002_lock_trigger_functions.sql` 실행, 로그인 메일 숫자코드·6자리·10분 설정, `.env` 작성 후 휴대폰 확인, 끝나면 토큰·네트워크 시크릿 삭제
 
 ## 작업 규칙
 1. 작업 전에 관련 파일을 먼저 읽고 확인한다.
