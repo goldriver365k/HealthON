@@ -76,7 +76,10 @@ export async function loadAll(): Promise<Partial<AppState>> {
     must(sb.from('appointment_questions').select('*')),
     must(sb.from('emergency_contacts').select('*').order('priority')),
     must(sb.from('notification_settings').select('*').maybeSingle()),
-    must(sb.from('daily_steps').select('step_date, steps, source').gte('step_date', stepsSince).order('step_date', { ascending: false })),
+    // 걸음 표가 아직 없거나(SQL 미실행) 읽기 실패해도 나머지 기록은 보여 준다
+    must(sb.from('daily_steps').select('step_date, steps, source').gte('step_date', stepsSince).order('step_date', { ascending: false })).catch(
+      () => [],
+    ),
   ]);
   return {
     settings: {
