@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, TextInput, View, type KeyboardTypeOptions } from 'react-native';
 
 import { useFontScale } from '@/data/store';
-import { colors, fontSize, maxFontSizeMultiplier, sizes, spacing } from '@/theme';
+import { colors, fontFamily, fontSize, maxFontSizeMultiplier, sizes, spacing } from '@/theme';
 import { AppText } from './AppText';
 
 export interface TextFieldProps {
@@ -69,7 +69,7 @@ export function TextField({
           accessibilityLabel={unit ? `${label}, 단위 ${unit}` : label}
           accessibilityHint={error ?? help}
           maxFontSizeMultiplier={maxFontSizeMultiplier}
-          style={[styles.input, { fontSize: size, fontWeight: big ? '700' : '400' }, multiline && styles.multiline]}
+          style={[styles.input, { fontSize: size, fontFamily: big ? fontFamily.bold : fontFamily.regular }, multiline && styles.multiline]}
         />
         {unit ? (
           <AppText tone="sub" style={styles.unit}>

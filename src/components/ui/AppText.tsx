@@ -1,7 +1,7 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
 import { useFontScale } from '@/data/store';
-import { colors, fontSize, lineHeightRatio, maxFontSizeMultiplier, type TextVariant } from '@/theme';
+import { colors, fontFamily, fontSize, lineHeightRatio, maxFontSizeMultiplier, type TextVariant } from '@/theme';
 
 type Tone = 'default' | 'sub' | 'primary' | 'danger' | 'onPrimary' | 'sample';
 
@@ -37,7 +37,8 @@ export function AppText({ variant = 'body', tone = 'default', bold, center, styl
           fontSize: size,
           lineHeight: Math.round(size * lineHeightRatio),
           color: toneColor[tone],
-          fontWeight: bold || isHeavy ? '700' : '400',
+          // 굵기는 서체 파일로 정한다 (사용자 지정 서체에 fontWeight를 함께 주면 기기에 따라 다른 서체로 바뀔 수 있음)
+          fontFamily: bold || isHeavy ? fontFamily.bold : fontFamily.regular,
         },
         center && styles.center,
         style,

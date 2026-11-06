@@ -47,7 +47,7 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
 건강 수치에 대한 "정상/높음/위험" 판정 문구·색 표시.
 
 ## 화면 규칙
-- 글씨는 반드시 `AppText` 사용 (본문 19pt, 보조 17pt 이상, 중요 숫자 34pt). 화면 파일에 글씨 크기·색 코드 직접 쓰지 않기 → `src/theme`
+- 글씨는 반드시 `AppText` 사용 (서체 Pretendard 보통·굵게, 본문 19pt, 보조 17pt 이상, 중요 숫자 40pt, 줄 간격 1.5배). 화면 파일에 글씨 크기·색 코드 직접 쓰지 않기 → `src/theme`
 - 버튼은 `AppButton` (높이 56dp, 글자 필수, 아이콘만 있는 버튼 금지)
 - 화면당 핵심 행동 1~3개, 애니메이션 금지, 다크 모드 없음(1차)
 - 상태는 색 + 아이콘 + 글자 (`StatusMark`, `ChoiceButtons`)

@@ -7,7 +7,7 @@ export const colors = {
   background: '#FAF8F5', // 밝은 미색 배경
   surface: '#FFFFFF', // 카드 배경
   surfaceMuted: '#F2EFEA', // 눌림·비활성 배경
-  border: '#D6D0C6',
+  border: '#B8B0A3', // 카드 경계가 잘 보이도록 (흰 배경 대비 약 2.1:1)
   borderStrong: '#8A8378',
 
   text: '#1C2433', // 진한 남색 (본문)

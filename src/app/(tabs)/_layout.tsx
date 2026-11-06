@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon, AppText } from '@/components/ui';
-import { colors, fontSize, spacing, type IconName } from '@/theme';
+import { colors, fontFamily, fontSize, spacing, type IconName } from '@/theme';
 
 /**
  * 하단 메뉴 4개 고정.
@@ -56,5 +56,5 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabLabel: { fontSize: fontSize.caption, lineHeight: 22 },
+  tabLabel: { fontSize: fontSize.caption, lineHeight: 24, fontFamily: fontFamily.regular },
 });

@@ -4,6 +4,7 @@
  *    (체험 모드는 로그인·동의 없이 바로 앱 화면 — 예시 데이터만 다룸)
  * 화면 전환 효과는 기본값만 사용.
  */
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
@@ -77,6 +78,12 @@ function Root() {
 }
 
 export default function RootLayout() {
+  // 서체(Pretendard)를 먼저 불러온다. 실패하면 휴대폰 기본 서체로 그대로 진행
+  const [fontsLoaded, fontError] = useFonts({
+    'Pretendard-Regular': require('../../assets/fonts/Pretendard-Regular.otf'),
+    'Pretendard-Bold': require('../../assets/fonts/Pretendard-Bold.otf'),
+  });
+  if (!fontsLoaded && !fontError) return null;
   return (
     <AuthProvider>
       <FlashProvider>
