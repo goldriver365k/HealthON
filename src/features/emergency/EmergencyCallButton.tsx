@@ -9,7 +9,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppIcon, AppText } from '@/components/ui';
 import { useAppState } from '@/data/store';
-import { colors, sizes, spacing } from '@/theme';
+import { colors, shadows, sizes, spacing } from '@/theme';
 import { confirmAsync } from '@/utils/confirm';
 import { runEmergencyCall } from './emergencyCall';
 
@@ -90,7 +90,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
+    boxShadow: shadows.button,
   },
-  pressed: { backgroundColor: colors.dangerPressed },
+  pressed: { backgroundColor: colors.dangerPressed, boxShadow: 'none' },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
 });

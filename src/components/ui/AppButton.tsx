@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { colors, sizes, spacing, type IconName } from '@/theme';
+import { colors, shadows, sizes, spacing, type IconName } from '@/theme';
 import { AppIcon } from './AppIcon';
 import { AppText } from './AppText';
 
@@ -62,6 +62,7 @@ export function AppButton({
           backgroundColor: pressed ? p.pressed : p.bg,
           borderColor: p.border,
         },
+        (variant === 'primary' || variant === 'danger') && !disabled && !pressed && styles.raised,
         variant === 'ghost' && styles.ghost,
         block ? styles.block : styles.inline,
         disabled && styles.disabled,
@@ -85,6 +86,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     justifyContent: 'center',
   },
+  /** 주요·위험 버튼은 살짝 떠 보이게 (누르면 그림자 없어짐 = 눌린 느낌) */
+  raised: { boxShadow: shadows.button },
   ghost: { paddingHorizontal: spacing.sm },
   block: { alignSelf: 'stretch' },
   inline: { alignSelf: 'flex-start' },

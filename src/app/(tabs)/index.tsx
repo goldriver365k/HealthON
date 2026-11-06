@@ -2,7 +2,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { AppButton, AppIcon, AppText, Card, Notice, SampleBadge, Screen, StatusMark } from '@/components/ui';
+import { AppButton, AppIcon, AppText, Card, CardTitle, Notice, SampleBadge, Screen, StatusMark } from '@/components/ui';
 import { dataMode } from '@/data/config';
 import { DoseRow } from '@/features/today/DoseRow';
 import { NotificationReminder } from '@/features/today/NotificationReminder';
@@ -11,7 +11,7 @@ import { EmergencyCallButton } from '@/features/emergency/EmergencyCallButton';
 import { appointmentsOnDate, dosesForDate, latestOnDate, questionsOf, todayProgress } from '@/data/selectors';
 import { useAppState } from '@/data/store';
 import { useNow } from '@/hooks/useNow';
-import { colors, spacing } from '@/theme';
+import { colors, shadows, sizes, spacing } from '@/theme';
 import { formatLongDate, formatTime, toDateKey } from '@/utils/date';
 import { glucoseTimingLabel } from '@/utils/labels';
 
@@ -32,10 +32,10 @@ export default function TodayScreen() {
       showSettings
       header={
         <View style={styles.header} accessible accessibilityRole="header" accessibilityLabel={`오늘은 ${formatLongDate(now)}. 오늘 할 일 ${progress.total}개 중 ${progress.done}개 했어요`}>
-          <AppText variant="date">{formatLongDate(now)}</AppText>
+          <AppText variant="date" tone="onPrimary">{formatLongDate(now)}</AppText>
           <View style={styles.progress}>
-            <AppIcon name={allDone ? 'done' : 'todo'} color={allDone ? colors.primary : colors.textSub} />
-            <AppText variant="heading" tone={allDone ? 'primary' : 'default'} style={styles.progressText}>
+            <AppIcon name={allDone ? 'done' : 'todo'} color={colors.textOnPrimary} />
+            <AppText variant="heading" tone="onPrimary" style={styles.progressText}>
               {allDone ? '오늘 할 일을 다 했어요' : `오늘 할 일 ${progress.total}개 중 ${progress.done}개 했어요`}
             </AppText>
           </View>
@@ -49,9 +49,7 @@ export default function TodayScreen() {
 
       {/* 약 확인 */}
       <Card>
-        <AppText variant="heading" accessibilityRole="header">
-          오늘 드실 약
-        </AppText>
+        <CardTitle icon="meds" title="오늘 드실 약" />
         {doses.length === 0 ? (
           <AppText tone="sub">오늘 드실 약이 없어요. ‘약·병원’에서 약을 등록할 수 있어요.</AppText>
         ) : (
@@ -61,12 +59,7 @@ export default function TodayScreen() {
 
       {/* 혈압 */}
       <Card>
-        <View style={styles.cardHead}>
-          <AppText variant="heading" accessibilityRole="header">
-            혈압
-          </AppText>
-          {bp ? <SampleBadge source={bp.source} /> : null}
-        </View>
+        <CardTitle icon="bp" title="혈압" right={bp ? <SampleBadge source={bp.source} /> : null} />
         {bp ? (
           <View accessible accessibilityLabel={`오늘 혈압 위 숫자 ${bp.systolic}, 아래 숫자 ${bp.diastolic}, ${formatTime(new Date(bp.measuredAt))}에 기록`}>
             <StatusMark done doneText={`기록했어요 · ${formatTime(new Date(bp.measuredAt))}`} />
@@ -89,12 +82,7 @@ export default function TodayScreen() {
 
       {/* 혈당 */}
       <Card>
-        <View style={styles.cardHead}>
-          <AppText variant="heading" accessibilityRole="header">
-            혈당
-          </AppText>
-          {glucose ? <SampleBadge source={glucose.source} /> : null}
-        </View>
+        <CardTitle icon="glucose" title="혈당" right={glucose ? <SampleBadge source={glucose.source} /> : null} />
         {glucose ? (
           <View accessible accessibilityLabel={`오늘 혈당 ${glucose.glucoseMgdl}, ${glucoseTimingLabel[glucose.glucoseTiming]}`}>
             <StatusMark done doneText={`기록했어요 · ${formatTime(new Date(glucose.measuredAt))}`} />
@@ -154,7 +142,14 @@ export default function TodayScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: spacing.sm },
+  // 맨 위 날짜 띠: 진한 청록 바탕 + 흰 글씨 (대비 6.9:1)
+  header: {
+    gap: spacing.sm,
+    backgroundColor: colors.primary,
+    borderRadius: sizes.radiusCard,
+    padding: spacing.lg,
+    boxShadow: shadows.hero,
+  },
   progress: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   progressText: { flex: 1 },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },

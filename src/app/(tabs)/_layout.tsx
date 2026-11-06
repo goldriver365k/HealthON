@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon, AppText } from '@/components/ui';
-import { colors, fontFamily, fontSize, spacing, type IconName } from '@/theme';
+import { colors, fontFamily, fontSize, shadows, spacing, type IconName } from '@/theme';
 
 /**
  * 하단 메뉴 4개 고정.
@@ -27,8 +27,9 @@ export default function TabLayout() {
           height: 80 + insets.bottom,
           paddingBottom: insets.bottom,
           backgroundColor: colors.surface,
-          borderTopColor: colors.borderStrong,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
+          boxShadow: shadows.tabBar,
         },
         tabBarItemStyle: { paddingVertical: spacing.xs },
       }}>
