@@ -42,3 +42,6 @@ example
 /ios
 /android
 !.env.example
+
+# Expo 토큰 (start-app.bat이 읽음) — 절대 올리지 않음
+expo-token.txt
