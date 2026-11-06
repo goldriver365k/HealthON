@@ -127,3 +127,24 @@ describe('병원 가는 날: 달 단위 이동·달력 칸', () => {
     expect(formatYearMonth(new Date(2026, 10, 4))).toBe('2026년 11월');
   });
 });
+
+describe('약 봉투에 적힌 대로 고르기 (앱이 정하지 않고 옮겨 적기만)', () => {
+  const { applyEnvelope, envelopeMemo } = require('../medPreset') as typeof import('../medPreset');
+
+  it('하루 3번 + 식후 30분 → 아침 8:00 점심 12:30 저녁 6:30', () => {
+    expect(applyEnvelope({}, '3', 'after30')).toEqual({ morning: '08:00', noon: '12:30', evening: '18:30' });
+  });
+  it('하루 2번 + 식사 전 30분 → 아침·저녁, 자기 전은 그대로 둠', () => {
+    expect(applyEnvelope({ bedtime: '21:30', noon: '12:30' }, '2', 'before30')).toEqual({ morning: '07:00', evening: '17:30', bedtime: '21:30' });
+  });
+  it('횟수 없이 식사 기준만 바꾸면 골라 둔 때의 시간만 바뀜', () => {
+    expect(applyEnvelope({ morning: '09:00', evening: '20:00' }, null, 'right_after')).toEqual({ morning: '07:30', evening: '18:00' });
+  });
+  it('식사 기준을 고르지 않으면 이미 정한 시간은 유지', () => {
+    expect(applyEnvelope({ morning: '09:00' }, '2', null)).toEqual({ morning: '09:00', evening: '18:30' });
+  });
+  it('메모 글', () => {
+    expect(envelopeMemo('3', 'after30')).toBe('하루 3번 · 식사 후 30분');
+    expect(envelopeMemo(null, null)).toBe('');
+  });
+});
