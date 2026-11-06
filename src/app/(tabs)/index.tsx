@@ -7,6 +7,7 @@ import { dataMode } from '@/data/config';
 import { DoseRow } from '@/features/today/DoseRow';
 import { NotificationReminder } from '@/features/today/NotificationReminder';
 import { StepsToday } from '@/features/steps/StepsToday';
+import { EmergencyCallButton } from '@/features/emergency/EmergencyCallButton';
 import { appointmentsOnDate, dosesForDate, latestOnDate, questionsOf, todayProgress } from '@/data/selectors';
 import { useAppState } from '@/data/store';
 import { useNow } from '@/hooks/useNow';
@@ -29,6 +30,7 @@ export default function TodayScreen() {
     <Screen
       title="오늘"
       showSettings
+      footer={<EmergencyCallButton />}
       header={
         <View style={styles.header} accessible accessibilityRole="header" accessibilityLabel={`오늘은 ${formatLongDate(now)}. 오늘 할 일 ${progress.total}개 중 ${progress.done}개 했어요`}>
           <AppText variant="date">{formatLongDate(now)}</AppText>

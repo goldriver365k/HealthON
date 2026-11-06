@@ -39,6 +39,12 @@
         {
           "motionPermission": "걸음 수를 기록하려고 휴대폰의 동작 및 피트니스 기록을 읽어요."
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "긴급호출을 누르면 지금 위치를 등록된 번호에 문자로 보내려고 위치를 확인해요."
+        }
       ]
     ],
     "experiments": {

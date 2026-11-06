@@ -28,6 +28,7 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
 - 로그인 방식 결정(2026-11-04): 지금은 이메일 숫자코드 유지, 4단계에서 카카오 로그인 추가(ROADMAP 4단계 8번). 휴대폰 문자 로그인은 유료라 보류.
 - 처방전·약봉투 사진 읽기(2026-11-06 결정): 4단계 이후 후속, 기기 안 글자 인식(A). 같은 날 처방전+봉투 합치기 규칙은 FEATURES.md. 먼저 '약 봉투에 적힌 대로 고르기' 입력 완료(src/utils/medPreset.ts).
 - 큰 알림창·움직임 알림(2026-11-06): src/notifications/ReminderModal.tsx, moveSettings.ts(AsyncStorage). 가족 안부 알림은 4단계(ROADMAP 4단계 9번).
+- 긴급호출(2026-11-06 승인): `expo-location`·`expo-sms` 설치, src/features/emergency/. 등록된 긴급 연락처에만(119 없음), 2초 길게 누르기/짧게는 확인창, 위치 문자 후 첫 연락처 전화. 위치 서버 저장 없음, 4단계 위치정보 검토.
 - 남음(사용자): 6장 나머지(재실행 후 기록 유지·알림·계정 삭제·오프라인) + 가족 공유(계정 2개)
 
 ## 작업 규칙

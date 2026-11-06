@@ -148,3 +148,25 @@ describe('약 봉투에 적힌 대로 고르기 (앱이 정하지 않고 옮겨 
     expect(envelopeMemo(null, null)).toBe('');
   });
 });
+
+describe('긴급호출 문자 (판정 없음, 사람이 누를 때만)', () => {
+  const { emergencyMessage, mapLink, dialable } = require('@/features/emergency/message') as typeof import('@/features/emergency/message');
+  const now = new Date(2026, 10, 6, 9, 5);
+
+  it('위치가 있으면 주소와 지도 링크', () => {
+    const msg = emergencyMessage('김예시', { latitude: 37.5665, longitude: 126.978, address: '서울 중구 세종대로 110' }, now);
+    expect(msg).toContain('김예시님이 도움을 요청했어요. (11/6 09:05)');
+    expect(msg).toContain('현재 위치: 서울 중구 세종대로 110');
+    expect(msg).toContain('https://map.kakao.com/link/map/현재위치,37.566500,126.978000');
+  });
+  it('위치를 못 구하면 그렇게 알림, 이름 없으면 일반 표현', () => {
+    const msg = emergencyMessage('', null, now);
+    expect(msg).toContain('오늘건강 사용자가 도움을 요청했어요');
+    expect(msg).toContain('위치는 확인하지 못했어요');
+    expect(msg).not.toMatch(/위험|정상|높|낮/);
+  });
+  it('전화번호 정리', () => {
+    expect(dialable('010-1234-5678')).toBe('01012345678');
+    expect(mapLink({ latitude: 1, longitude: 2 })).toContain('1.000000,2.000000');
+  });
+});
