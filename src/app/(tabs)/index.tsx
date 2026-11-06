@@ -30,7 +30,6 @@ export default function TodayScreen() {
     <Screen
       title="오늘"
       showSettings
-      footer={<EmergencyCallButton />}
       header={
         <View style={styles.header} accessible accessibilityRole="header" accessibilityLabel={`오늘은 ${formatLongDate(now)}. 오늘 할 일 ${progress.total}개 중 ${progress.done}개 했어요`}>
           <AppText variant="date">{formatLongDate(now)}</AppText>
@@ -147,6 +146,9 @@ export default function TodayScreen() {
       <AppText variant="caption" tone="sub">
         이 앱은 기록을 돕는 앱이에요. 병을 진단하거나 약을 바꾸라고 하지 않아요. 몸이 불편하면 의료진과 상담하세요.
       </AppText>
+
+      {/* 긴급호출: 화면 맨 아래 (끝까지 내려야 보임, 실수로 눌리지 않게) */}
+      <EmergencyCallButton />
     </Screen>
   );
 }
