@@ -24,7 +24,7 @@ Expo SDK 58 + React Native + TypeScript + Expo Router, (2단계부터) Supabase.
   ✅ 토큰 삭제 확인(2026-11-04, API 401). 이후 Supabase API 작업이 필요하면 사용자에게 새 토큰을 요청. 4단계(서울 새 프로젝트)에서는 Gmail 대신 도메인 연결된 발송 서비스로 교체.
 - ✅ `20261105000002_lock_trigger_functions.sql` 사용자 실행 완료(2026-11-04).
 - ✅ 휴대폰 연결(2026-11-04): Windows PC + 아이폰 Expo Go, 숫자코드 로그인·혈당 저장 확인. Windows 문제·해결은 SUPABASE_SETUP.md 6장.
-- 만보기(2026-11-04 승인): `expo-sensors` 설치, `daily_steps` 표(마이그레이션 20261106000001, DB 시험 40_daily_steps). 아이폰만 지원(최근 7일 읽어 저장), 안드로이드는 정식 빌드 후 헬스 커넥트. ⏸ 사용자가 SQL 실행 필요.
+- 만보기(2026-11-04 승인): `expo-sensors` 설치, `daily_steps` 표(마이그레이션 20261106000001, DB 시험 40_daily_steps). 아이폰만 지원(최근 7일 읽어 저장), 안드로이드는 정식 빌드 후 헬스 커넥트. ✅ 2026-11-06 아이폰에서 오늘 걸음 표시 확인. ⏸ SQL 실행 여부 미확인(저장 실패해도 화면엔 보임).
 - 로그인 방식 결정(2026-11-04): 지금은 이메일 숫자코드 유지, 4단계에서 카카오 로그인 추가(ROADMAP 4단계 8번). 휴대폰 문자 로그인은 유료라 보류.
 - 처방전·약봉투 사진 읽기(2026-11-06 결정): 4단계 이후 후속, 기기 안 글자 인식(A). 같은 날 처방전+봉투 합치기 규칙은 FEATURES.md. 먼저 '약 봉투에 적힌 대로 고르기' 입력 완료(src/utils/medPreset.ts).
 - 큰 알림창·움직임 알림(2026-11-06): src/notifications/ReminderModal.tsx, moveSettings.ts(AsyncStorage). 가족 안부 알림은 4단계(ROADMAP 4단계 9번).
