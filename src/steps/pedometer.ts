@@ -35,6 +35,19 @@ export async function requestStepPermission(): Promise<StepPermission> {
   return toState(r.status);
 }
 
+/** 최근 1시간 동안 걸었는지 (움직임 알림 건너뛰기용). 읽을 수 없으면 false */
+export const MOVED_STEPS_PER_HOUR = 100;
+export async function movedInLastHour(now: Date = new Date()): Promise<boolean> {
+  if (!stepsSupported) return false;
+  try {
+    if ((await Pedometer.getPermissionsAsync()).status !== 'granted') return false;
+    const { steps } = await Pedometer.getStepCountAsync(new Date(now.getTime() - 3600_000), now);
+    return steps >= MOVED_STEPS_PER_HOUR;
+  } catch {
+    return false;
+  }
+}
+
 /** 최근 며칠의 날짜별 걸음 수 (오늘은 지금까지) */
 export async function readRecentSteps(now: Date = new Date(), days = STEP_HISTORY_DAYS): Promise<{ date: DateKey; steps: number }[]> {
   if (!stepsSupported) return [];

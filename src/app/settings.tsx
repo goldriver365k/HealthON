@@ -10,6 +10,7 @@ import { AppButton, AppText, Card, ChoiceButtons, Notice, Screen, useFlash } fro
 import { useAuth } from '@/data/auth';
 import { useAppState, useFontScale, useRepository } from '@/data/store';
 import { useSafeAction } from '@/hooks/useSafeAction';
+import { saveMoveSettings, useMoveSettings } from '@/notifications/moveSettings';
 import { countScheduled, getPermission, notificationsSupported, sendTestNotification, type PermissionState } from '@/notifications/scheduler';
 import { fontScaleOptions } from '@/theme';
 import type { ConsentType } from '@/types/domain';
@@ -87,6 +88,7 @@ function NotificationCard() {
       <AppText variant="caption" tone="sub">
         숨기면 “아침 약을 확인해 주세요”처럼만 보여요. 다른 사람이 휴대폰을 볼 수 있다면 숨기기를 권해요.
       </AppText>
+      <MoveReminderSettings />
     </Card>
   );
 }
@@ -206,5 +208,53 @@ export default function SettingsScreen() {
         </Card>
       ) : null}
     </Screen>
+  );
+}
+
+const moveWindows = [
+  { value: '9-18', label: '오전 9시 ~ 오후 6시' },
+  { value: '10-18', label: '오전 10시 ~ 오후 6시' },
+  { value: '10-20', label: '오전 10시 ~ 오후 8시' },
+] as const;
+
+/** 움직임 알림 (이 휴대폰에만 저장, 처음엔 꺼짐) */
+function MoveReminderSettings() {
+  const move = useMoveSettings();
+  const windowValue = `${move.startHour}-${move.endHour}`;
+  return (
+    <>
+      <ChoiceButtons
+        label="움직임 알림"
+        options={onOff}
+        value={move.enabled ? 'on' : 'off'}
+        onChange={(v) => saveMoveSettings({ ...move, enabled: v === 'on' })}
+      />
+      <AppText variant="caption" tone="sub">
+        정한 시간마다 소리와 함께 “잠깐 움직여 볼까요?” 알림을 보내요. 앱을 켜 두었을 때 최근 1시간에 걸었다면 건너뛰어요.
+      </AppText>
+      {move.enabled ? (
+        <>
+          <ChoiceButtons
+            label="얼마마다 알릴까요?"
+            options={[
+              { value: 1, label: '1시간마다' },
+              { value: 2, label: '2시간마다' },
+            ]}
+            value={move.intervalHours}
+            onChange={(v) => saveMoveSettings({ ...move, intervalHours: v as 1 | 2 })}
+          />
+          <ChoiceButtons
+            label="언제 알릴까요?"
+            options={moveWindows.map((w) => ({ value: w.value, label: w.label }))}
+            value={windowValue}
+            onChange={(v) => {
+              const [start, end] = v.split('-').map(Number);
+              saveMoveSettings({ ...move, startHour: start, endHour: end });
+            }}
+            columns={1}
+          />
+        </>
+      ) : null}
+    </>
   );
 }

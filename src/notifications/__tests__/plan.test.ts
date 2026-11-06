@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 import { reducer } from '@/data/reducer';
 import { createSampleState } from '@/data/sampleData';
-import { planNotifications } from '../plan';
+import { planMoveReminders, planNotifications } from '../plan';
 
 const now = new Date(2026, 10, 4, 9, 0); // 수요일 09:00
 
@@ -58,4 +58,24 @@ describe('알림 계획', () => {
     const text = planNotifications(s, now).map((p) => p.title + p.body).join(' ');
     expect(text).not.toMatch(/정상|위험|높|낮|진단|처방|바꾸|늘리|줄이/);
   });
+
+  it('약 알림에는 그 시간 약 일정 id가, 병원 알림에는 일정 id가 담김 (큰 알림창용)', () => {
+    const list = planNotifications(s, now);
+    const med = list.find((p) => p.id.startsWith('med|'))!;
+    expect(med.data.kind).toBe('med');
+    if (med.data.kind === 'med') expect(med.data.scheduleIds.length).toBeGreaterThan(0);
+    const apt = list.find((p) => p.id.startsWith('apt|'))!;
+    expect(apt.data).toEqual({ kind: 'apt', appointmentId: 's-apt-2' });
+  });
+
+  it('움직임 알림: 꺼져 있으면 없음, 켜면 시간대 안에서 간격마다', () => {
+    expect(planNotifications(s, now).some((p) => p.id.startsWith('move|'))).toBe(false);
+    const hourly = planMoveReminders({ enabled: true, intervalHours: 1, startHour: 10, endHour: 18 });
+    expect(hourly.map((p) => p.kind === 'daily' && p.hour)).toEqual([11, 12, 13, 14, 15, 16, 17, 18]);
+    const every2 = planMoveReminders({ enabled: true, intervalHours: 2, startHour: 9, endHour: 18 });
+    expect(every2.map((p) => p.kind === 'daily' && p.hour)).toEqual([11, 13, 15, 17]);
+    const text = hourly.map((p) => p.title + p.body).join(' ');
+    expect(text).not.toMatch(/정상|위험|높|낮|진단|처방|바꾸|늘리|줄이/);
+  });
 });
+
