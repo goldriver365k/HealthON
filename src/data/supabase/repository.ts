@@ -134,6 +134,9 @@ const inviteReason: Record<string, string> = {
 };
 
 export function createCloudRepository(dispatch: Dispatch<Action>, getState: () => AppState): Repository {
+  // 서버에 저장이 끝난 걸음 수 (날짜 → 걸음)
+  const savedSteps = new Map<string, number>();
+  let savedStepsLoaded = false;
   const sb = () => getSupabase();
 
   const reloadMeds = async () => {
@@ -347,18 +350,30 @@ export function createCloudRepository(dispatch: Dispatch<Action>, getState: () =
     async saveDailySteps(items) {
       if (!items.length) return;
       // 바뀐 날만 저장 (앱을 열 때마다 같은 값을 다시 쓰지 않도록)
-      const known = new Map(getState().dailySteps.map((d) => [d.date, d.steps]));
-      const changed = items.filter((i) => known.get(i.date) !== i.steps);
+      // 서버에 저장된 값과 비교 (화면에만 보이고 저장 못 한 날은 다시 저장 시도)
+      if (!savedStepsLoaded) {
+        getState().dailySteps.forEach((d) => savedSteps.set(d.date, d.steps));
+        savedStepsLoaded = true;
+      }
+      const changed = items.filter((i) => savedSteps.get(i.date) !== i.steps);
       if (!changed.length) return;
-      await must(
-        sb()
-          .from('daily_steps')
-          .upsert(
-            changed.map((i) => ({ step_date: i.date, steps: i.steps })),
-            { onConflict: 'user_id,step_date' },
-          ),
-      );
+      // 휴대폰에서 읽은 걸음은 서버 저장에 실패해도 화면에는 먼저 보여 준다
+      // (걸음 표가 아직 없거나 인터넷이 끊겨도 오늘 걸음은 보이도록. 다음 동기화 때 다시 저장 시도)
       dispatch({ type: 'steps/upsert', items: changed.map((i) => ({ ...i, source: 'real' as const })) });
+      try {
+        await must(
+          sb()
+            .from('daily_steps')
+            .upsert(
+              changed.map((i) => ({ step_date: i.date, steps: i.steps })),
+              { onConflict: 'user_id,step_date' },
+            ),
+        );
+        changed.forEach((i) => savedSteps.set(i.date, i.steps));
+      } catch (e) {
+        if (__DEV__) console.warn('[steps] 서버 저장 실패'); // 걸음 수는 남기지 않음
+        throw e;
+      }
     },
     async resetSampleData() {
       // 서버 모드에는 예시 데이터가 없다
