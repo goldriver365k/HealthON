@@ -53,7 +53,8 @@ export const shareCategoryLabel: Record<ShareCategory, string> = {
   appointments: '병원 일정',
 };
 
-export const shareCategories: ShareCategory[] = ['bp', 'glucose', 'weight', 'intakes', 'appointments'];
+/** 가족에게 보여 줄 항목 고르기. 체중은 화면에서 뺐다 (2026-11-06) — 새로 고르면 체중은 공유되지 않음 */
+export const shareCategories: ShareCategory[] = ['bp', 'glucose', 'intakes', 'appointments'];
 
 /** 기록 값 한 줄 표시: "128 / 82", "105", "62.4" */
 export function measurementValueText(m: Measurement): string {

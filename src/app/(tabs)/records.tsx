@@ -20,9 +20,10 @@ import { dailyValues, filterRecentDays, summarizePeriod, type PeriodSummary } fr
 
 type RecordView = MeasurementKind | 'meds' | 'steps';
 const viewOptions: { value: RecordView; label: string }[] = [
-  ...(['bp', 'glucose', 'weight'] as const).map((value) => ({ value, label: kindLabel[value] })),
-  { value: 'meds', label: '약' },
+  // 체중은 화면에서 뺐다 (2026-11-06 사용자 결정). 저장된 기록·DB는 그대로 둔다
+  ...(['bp', 'glucose'] as const).map((value) => ({ value, label: kindLabel[value] })),
   { value: 'steps', label: '걸음' },
+  { value: 'meds', label: '약' },
 ];
 const periodOptions = [
   { value: 7, label: '최근 7일' },

@@ -1,4 +1,4 @@
-/** 새 건강 기록 (혈압·혈당·체중 공용 화면, ?kind=bp|glucose|weight) */
+/** 새 건강 기록 (혈압·혈당 공용 화면, ?kind=bp|glucose) */
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { useFlash } from '@/components/ui';
@@ -8,7 +8,8 @@ import { useSafeAction } from '@/hooks/useSafeAction';
 import type { MeasurementKind } from '@/types/domain';
 import { kindLabel } from '@/utils/labels';
 
-const KINDS: MeasurementKind[] = ['bp', 'glucose', 'weight'];
+// 체중은 새로 기록하지 않음 (화면에서 뺌). 예전 체중 기록 고치기는 record/[id]에서 그대로 가능
+const KINDS: MeasurementKind[] = ['bp', 'glucose'];
 
 export default function NewRecordScreen() {
   const params = useLocalSearchParams<{ kind?: string }>();
