@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
   row: {
     gap: spacing.md,
     paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderTopWidth: 1, // 약 사이 구분선 (마지막 약 아래에는 선이 남지 않게 위쪽에)
+    borderTopColor: colors.border,
   },
   info: { gap: spacing.xs },
   titleLine: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },
